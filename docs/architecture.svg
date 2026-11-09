@@ -1,0 +1,517 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="3160" height="5920" viewBox="0 0 3160 5920" role="img" aria-labelledby="title desc">
+<title id="title">内网论文评审 Agent：模块、硬件与交互全景</title>
+<desc id="desc">十个模块覆盖材料上传、任务编排、文档解析、规范检索、四维评审、本地模型、证据存储、报告生成、联网网关与安全运维。蓝色为评审主流程，青色为本地工具调用，灰色虚线为持久化，橙色为受控联网查询，绿色为公开证据入网。CPU 与内存为共享部署的规划预算，不是独占硬件或实测值。</desc>
+<defs>
+<marker id="3268CB" markerWidth="9" markerHeight="9" refX="7.8" refY="4.5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L9,4.5 L0,9 Z" fill="#3268CB"/></marker>
+<marker id="3268CB-s" markerWidth="9" markerHeight="9" refX="1.2" refY="4.5" orient="auto" markerUnits="userSpaceOnUse"><path d="M9,0 L0,4.5 L9,9 Z" fill="#3268CB"/></marker>
+<marker id="12877F" markerWidth="9" markerHeight="9" refX="7.8" refY="4.5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L9,4.5 L0,9 Z" fill="#12877F"/></marker>
+<marker id="12877F-s" markerWidth="9" markerHeight="9" refX="1.2" refY="4.5" orient="auto" markerUnits="userSpaceOnUse"><path d="M9,0 L0,4.5 L9,9 Z" fill="#12877F"/></marker>
+<marker id="C17726" markerWidth="9" markerHeight="9" refX="7.8" refY="4.5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L9,4.5 L0,9 Z" fill="#C17726"/></marker>
+<marker id="C17726-s" markerWidth="9" markerHeight="9" refX="1.2" refY="4.5" orient="auto" markerUnits="userSpaceOnUse"><path d="M9,0 L0,4.5 L9,9 Z" fill="#C17726"/></marker>
+<marker id="2A8A62" markerWidth="9" markerHeight="9" refX="7.8" refY="4.5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L9,4.5 L0,9 Z" fill="#2A8A62"/></marker>
+<marker id="2A8A62-s" markerWidth="9" markerHeight="9" refX="1.2" refY="4.5" orient="auto" markerUnits="userSpaceOnUse"><path d="M9,0 L0,4.5 L9,9 Z" fill="#2A8A62"/></marker>
+<marker id="8B9CAF" markerWidth="9" markerHeight="9" refX="7.8" refY="4.5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L9,4.5 L0,9 Z" fill="#8B9CAF"/></marker>
+<marker id="8B9CAF-s" markerWidth="9" markerHeight="9" refX="1.2" refY="4.5" orient="auto" markerUnits="userSpaceOnUse"><path d="M9,0 L0,4.5 L9,9 Z" fill="#8B9CAF"/></marker>
+<marker id="FFFFFF" markerWidth="9" markerHeight="9" refX="7.8" refY="4.5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L9,4.5 L0,9 Z" fill="#FFFFFF"/></marker>
+<marker id="FFFFFF-s" markerWidth="9" markerHeight="9" refX="1.2" refY="4.5" orient="auto" markerUnits="userSpaceOnUse"><path d="M9,0 L0,4.5 L9,9 Z" fill="#FFFFFF"/></marker>
+</defs>
+<g font-family="Arial, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Noto Sans CJK SC, sans-serif">
+<rect x="0" y="0" width="3160" height="2700" rx="0" fill="#F7F9FC" stroke="none" stroke-width="1" />
+<text x="70" y="84" font-size="55" fill="#182D47" font-weight="700" text-anchor="start" >内网论文评审 Agent</text>
+<text x="70" y="133" font-size="27" fill="#61748A" font-weight="400" text-anchor="start" >目标架构 / 单张 A100 · 低并发 · 本地推理；下半部为 demo 实现与详细协议</text>
+<rect x="2664" y="62" width="420" height="40" rx="10" fill="#E8EEF7" stroke="none" stroke-width="1" />
+<text x="2874.0" y="90" font-size="22" fill="#182D47" font-weight="500" text-anchor="middle" >架构与协议  v1.1  ·  2026-11-08</text>
+<rect x="70" y="178" width="2110" height="160" rx="20" fill="#EAF1FA" stroke="#D5E2F1" stroke-width="1" />
+<text x="98" y="215" font-size="27" fill="#182D47" font-weight="650" text-anchor="start" >内网主机｜CPU 服务 + 存储 + A100 推理，可共用一台服务器</text>
+<text x="98" y="257" font-size="25" fill="#20344D" font-weight="400" text-anchor="start" >起步规划：16–24 vCPU · 128GB 系统内存 · 1–2TB SSD · 现有 A100 40GB / 80GB</text>
+<text x="98" y="298" font-size="23" fill="#61748A" font-weight="400" text-anchor="start" >低并发优先排队执行；各模块资源共享，预算不代表必须独占；最终以原型实测校准。</text>
+<rect x="2260" y="178" width="830" height="160" rx="20" fill="#FFF2E2" stroke="#ECD5B5" stroke-width="1" />
+<text x="2288" y="215" font-size="27" fill="#875018" font-weight="650" text-anchor="start" >联网区｜独立网关主机 / 隔离虚拟机</text>
+<text x="2288" y="257" font-size="25" fill="#744C25" font-weight="400" text-anchor="start" >2–4 vCPU · 4–8GB RAM · 20–50GB SSD</text>
+<text x="2288" y="298" font-size="23" fill="#88613C" font-weight="400" text-anchor="start" >无需 GPU；仅此区域可访问批准的公网目标。</text>
+<rect x="40" y="380" width="2180" height="1940" rx="25" fill="#EFF4FA" stroke="#D3DFED" stroke-width="2" />
+<text x="72" y="428" font-size="28" fill="#182D47" font-weight="700" text-anchor="start" >内网评审区</text>
+<text x="270" y="428" font-size="23" fill="#61748A" font-weight="400" text-anchor="start" >原文、OCR、图片、向量、提示词、日志、报告均保留在内网</text>
+<rect x="2240" y="380" width="880" height="1940" rx="25" fill="#FFF9F0" stroke="#D8AF78" stroke-width="2" stroke-dasharray="10 8"/>
+<text x="2273" y="428" font-size="28" fill="#875018" font-weight="700" text-anchor="start" >联网检索区</text>
+<text x="2460" y="428" font-size="22" fill="#94704B" font-weight="400" text-anchor="start" >不保存论文；不提供外部模型推理</text>
+<path d="M 740 704 H 800" fill="none" stroke="#3268CB" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#3268CB)"/>
+<rect x="739.0" y="651" width="62" height="34" rx="7" fill="#F5F8FC" stroke="none" stroke-width="1" />
+<text x="770" y="675" font-size="19" fill="#3268CB" font-weight="500" text-anchor="middle" >提交</text>
+<path d="M 1460 704 H 1520" fill="none" stroke="#3268CB" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#3268CB)"/>
+<rect x="1459.0" y="651" width="62" height="34" rx="7" fill="#F5F8FC" stroke="none" stroke-width="1" />
+<text x="1490" y="675" font-size="19" fill="#3268CB" font-weight="500" text-anchor="middle" >任务</text>
+<path d="M 1850 940 V 1000 H 1360 V 1080" fill="none" stroke="#3268CB" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#3268CB)"/>
+<rect x="1498.18" y="966" width="269.64" height="34" rx="7" fill="#F5F8FC" stroke="none" stroke-width="1" />
+<text x="1633" y="990" font-size="23" fill="#3268CB" font-weight="500" text-anchor="middle" >结构化文档 + 位置索引</text>
+<path d="M 800 1320 H 740" fill="none" stroke="#3268CB" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#3268CB)"/>
+<rect x="739.0" y="1260" width="62" height="34" rx="7" fill="#F5F8FC" stroke="none" stroke-width="1" />
+<text x="770" y="1284" font-size="19" fill="#3268CB" font-weight="500" text-anchor="middle" >候选</text>
+<path d="M 1460 1320 H 1520" fill="none" stroke="#12877F" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#12877F)" marker-start="url(#12877F-s)"/>
+<rect x="1459.0" y="1260" width="62" height="34" rx="7" fill="#F5F8FC" stroke="none" stroke-width="1" />
+<text x="1490" y="1284" font-size="19" fill="#12877F" font-weight="500" text-anchor="middle" >检索</text>
+<path d="M 1120 1740 V 1880" fill="none" stroke="#12877F" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#12877F)" marker-start="url(#12877F-s)"/>
+<rect x="985.6800000000001" y="1788" width="268.64" height="34" rx="7" fill="#F5F8FC" stroke="none" stroke-width="1" />
+<text x="1120" y="1812" font-size="22" fill="#12877F" font-weight="500" text-anchor="middle" >推理请求 ↔ 结构化结果</text>
+<path d="M 900 1740 V 1800 H 470 V 1880" fill="none" stroke="#8B9CAF" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#8B9CAF)" stroke-dasharray="9 8"/>
+<rect x="579.52" y="1767" width="170.96" height="34" rx="7" fill="#F5F8FC" stroke="none" stroke-width="1" />
+<text x="665" y="1791" font-size="22" fill="#61748A" font-weight="500" text-anchor="middle" >证据 / 检查点</text>
+<path d="M 405 1740 V 1880" fill="none" stroke="#8B9CAF" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#8B9CAF)" marker-start="url(#8B9CAF-s)" stroke-dasharray="9 8"/>
+<rect x="312.36" y="1816" width="185.28" height="34" rx="7" fill="#F5F8FC" stroke="none" stroke-width="1" />
+<text x="405" y="1840" font-size="21" fill="#61748A" font-weight="500" text-anchor="middle" >原文定位 / 报告</text>
+<path d="M 80 1320 H 56 V 704 H 80" fill="none" stroke="#3268CB" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#3268CB)"/>
+<text x="57" y="1029" font-size="19" fill="#3268CB" font-weight="500" text-anchor="start" transform="rotate(-90 57 1029)">结果返回网页</text>
+<path d="M 2180 1320 H 2300" fill="none" stroke="#C17726" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#C17726)"/>
+<rect x="2208.0" y="1266" width="64" height="34" rx="7" fill="#FFF9F0" stroke="none" stroke-width="1" />
+<text x="2240" y="1290" font-size="20" fill="#C17726" font-weight="500" text-anchor="middle" >查询</text>
+<path d="M 2300 1435 H 2180" fill="none" stroke="#2A8A62" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#2A8A62)"/>
+<rect x="2208.0" y="1450" width="64" height="34" rx="7" fill="#FFF9F0" stroke="none" stroke-width="1" />
+<text x="2240" y="1474" font-size="20" fill="#2A8A62" font-weight="500" text-anchor="middle" >证据</text>
+<path d="M 2520 1080 V 940" fill="none" stroke="#C17726" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#C17726)"/>
+<rect x="2428.0" y="976" width="134" height="34" rx="7" fill="#FFF9F0" stroke="none" stroke-width="1" />
+<text x="2495" y="1000" font-size="22" fill="#C17726" font-weight="500" text-anchor="middle" >批准的请求</text>
+<path d="M 2870 940 V 1080" fill="none" stroke="#2A8A62" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#2A8A62)"/>
+<rect x="2802.0" y="1023" width="156" height="34" rx="7" fill="#FFF9F0" stroke="none" stroke-width="1" />
+<text x="2880" y="1047" font-size="22" fill="#2A8A62" font-weight="500" text-anchor="middle" >获取公开资料</text>
+<rect x="81" y="475" width="660" height="470" rx="23" fill="#DBE4EF" stroke="none" stroke-width="1" />
+<rect x="80" y="470" width="660" height="470" rx="23" fill="#FFFFFF" stroke="#D8E2EE" stroke-width="1" />
+<rect x="80" y="470" width="8" height="470" rx="4" fill="#3268CB" stroke="none" stroke-width="1" />
+<rect x="106" y="495" width="52" height="48" rx="13" fill="#3268CB" stroke="none" stroke-width="1" />
+<text x="132" y="529" font-size="25" fill="#FFFFFF" font-weight="700" text-anchor="middle" >01</text>
+<text x="176" y="530" font-size="32" fill="#182D47" font-weight="650" text-anchor="start" >材料入口与网页</text>
+<text x="108" y="573" font-size="21" fill="#61748A" font-weight="400" text-anchor="start" >React / PDF 预览 · 用户侧操作</text>
+<rect x="108.0" y="598" width="178.66666666666666" height="52" rx="11" fill="#F0F5FC" stroke="none" stroke-width="1" />
+<text x="197.33333333333331" y="632" font-size="23" fill="#3268CB" font-weight="550" text-anchor="middle" >上传 / 粘贴</text>
+<path d="M 293.66666666666663 624 H 313.66666666666663" fill="none" stroke="#3268CB" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#3268CB)"/>
+<rect x="320.66666666666663" y="598" width="178.66666666666666" height="52" rx="11" fill="#F0F5FC" stroke="none" stroke-width="1" />
+<text x="409.99999999999994" y="632" font-size="23" fill="#3268CB" font-weight="550" text-anchor="middle" >设置条件</text>
+<path d="M 506.33333333333326 624 H 526.3333333333333" fill="none" stroke="#3268CB" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#3268CB)"/>
+<rect x="533.3333333333333" y="598" width="178.66666666666666" height="52" rx="11" fill="#F0F5FC" stroke="none" stroke-width="1" />
+<text x="622.6666666666666" y="632" font-size="23" fill="#3268CB" font-weight="550" text-anchor="middle" >提交评审</text>
+<text x="108" y="694" font-size="23" fill="#20344D" font-weight="400" text-anchor="start" >PDF / DOCX / 图片 / 文本；可附补充材料</text>
+<text x="108" y="732" font-size="23" fill="#20344D" font-weight="400" text-anchor="start" >类型、学位、规范版本、可选提示词</text>
+<text x="108" y="770" font-size="23" fill="#20344D" font-weight="400" text-anchor="start" >查看进度 → 定位原文 → 复制 / 下载报告</text>
+<text x="108" y="819" font-size="22" fill="#61748A" font-weight="400" text-anchor="start" >交互：提交至 02；08 的结果在此展示。</text>
+<rect x="108" y="835" width="604" height="84" rx="12" fill="#F2F5F9" stroke="none" stroke-width="1" />
+<text x="124" y="867" font-size="21" fill="#61748A" font-weight="500" text-anchor="start" >终端：普通浏览器；服务端约 1 vCPU / 1GB</text>
+<text x="124" y="900" font-size="21" fill="#61748A" font-weight="500" text-anchor="start" >无 GPU；静态资源在内网托管。</text>
+<rect x="801" y="475" width="660" height="470" rx="23" fill="#DBE4EF" stroke="none" stroke-width="1" />
+<rect x="800" y="470" width="660" height="470" rx="23" fill="#FFFFFF" stroke="#D8E2EE" stroke-width="1" />
+<rect x="800" y="470" width="8" height="470" rx="4" fill="#3268CB" stroke="none" stroke-width="1" />
+<rect x="826" y="495" width="52" height="48" rx="13" fill="#3268CB" stroke="none" stroke-width="1" />
+<text x="852" y="529" font-size="25" fill="#FFFFFF" font-weight="700" text-anchor="middle" >02</text>
+<text x="896" y="530" font-size="32" fill="#182D47" font-weight="650" text-anchor="start" >业务服务与任务调度</text>
+<text x="828" y="573" font-size="21" fill="#61748A" font-weight="400" text-anchor="start" >FastAPI + Celery / Redis</text>
+<rect x="828.0" y="598" width="178.66666666666666" height="52" rx="11" fill="#F0F5FC" stroke="none" stroke-width="1" />
+<text x="917.3333333333334" y="632" font-size="23" fill="#3268CB" font-weight="550" text-anchor="middle" >认证 / 校验</text>
+<path d="M 1013.6666666666666 624 H 1033.6666666666665" fill="none" stroke="#3268CB" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#3268CB)"/>
+<rect x="1040.6666666666667" y="598" width="178.66666666666666" height="52" rx="11" fill="#F0F5FC" stroke="none" stroke-width="1" />
+<text x="1130.0" y="632" font-size="23" fill="#3268CB" font-weight="550" text-anchor="middle" >创建任务</text>
+<path d="M 1226.3333333333335 624 H 1246.3333333333335" fill="none" stroke="#3268CB" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#3268CB)"/>
+<rect x="1253.3333333333333" y="598" width="178.66666666666666" height="52" rx="11" fill="#F0F5FC" stroke="none" stroke-width="1" />
+<text x="1342.6666666666665" y="632" font-size="23" fill="#3268CB" font-weight="550" text-anchor="middle" >排队执行</text>
+<text x="828" y="694" font-size="23" fill="#20344D" font-weight="400" text-anchor="start" >分配任务 ID、文件权限与独立工作目录</text>
+<text x="828" y="732" font-size="23" fill="#20344D" font-weight="400" text-anchor="start" >状态更新、取消、超时、重试与恢复</text>
+<text x="828" y="770" font-size="23" fill="#20344D" font-weight="400" text-anchor="start" >限制 GPU 同时执行数，防止单卡显存争抢</text>
+<text x="828" y="819" font-size="22" fill="#61748A" font-weight="400" text-anchor="start" >交互：驱动 03 / 05 / 08；状态与文件入 07。</text>
+<rect x="828" y="835" width="604" height="84" rx="12" fill="#F2F5F9" stroke="none" stroke-width="1" />
+<text x="844" y="867" font-size="21" fill="#61748A" font-weight="500" text-anchor="start" >CPU：2–4 vCPU；RAM：4–8GB</text>
+<text x="844" y="900" font-size="21" fill="#61748A" font-weight="500" text-anchor="start" >无 GPU；队列与任务状态保存在内网。</text>
+<rect x="1521" y="475" width="660" height="470" rx="23" fill="#DBE4EF" stroke="none" stroke-width="1" />
+<rect x="1520" y="470" width="660" height="470" rx="23" fill="#FFFFFF" stroke="#D8E2EE" stroke-width="1" />
+<rect x="1520" y="470" width="8" height="470" rx="4" fill="#3268CB" stroke="none" stroke-width="1" />
+<rect x="1546" y="495" width="52" height="48" rx="13" fill="#3268CB" stroke="none" stroke-width="1" />
+<text x="1572" y="529" font-size="25" fill="#FFFFFF" font-weight="700" text-anchor="middle" >03</text>
+<text x="1616" y="530" font-size="32" fill="#182D47" font-weight="650" text-anchor="start" >文档解析与定位</text>
+<text x="1548" y="573" font-size="21" fill="#61748A" font-weight="400" text-anchor="start" >Docling · 本地 OCR · 图表 / 公式提取</text>
+<rect x="1548.0" y="598" width="178.66666666666666" height="52" rx="11" fill="#F0F5FC" stroke="none" stroke-width="1" />
+<text x="1637.3333333333333" y="632" font-size="23" fill="#3268CB" font-weight="550" text-anchor="middle" >识别格式</text>
+<path d="M 1733.6666666666667 624 H 1753.6666666666667" fill="none" stroke="#3268CB" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#3268CB)"/>
+<rect x="1760.6666666666667" y="598" width="178.66666666666666" height="52" rx="11" fill="#F0F5FC" stroke="none" stroke-width="1" />
+<text x="1850.0" y="632" font-size="23" fill="#3268CB" font-weight="550" text-anchor="middle" >解析 / OCR</text>
+<path d="M 1946.3333333333335 624 H 1966.3333333333335" fill="none" stroke="#3268CB" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#3268CB)"/>
+<rect x="1973.3333333333333" y="598" width="178.66666666666666" height="52" rx="11" fill="#F0F5FC" stroke="none" stroke-width="1" />
+<text x="2062.6666666666665" y="632" font-size="23" fill="#3268CB" font-weight="550" text-anchor="middle" >建立位置索引</text>
+<text x="1548" y="694" font-size="23" fill="#20344D" font-weight="400" text-anchor="start" >保留章节、表格、图片、原文与解析置信度</text>
+<text x="1548" y="732" font-size="23" fill="#20344D" font-weight="400" text-anchor="start" >PDF：物理页序 + 区域；DOCX：章节 + 段落</text>
+<text x="1548" y="770" font-size="23" fill="#20344D" font-weight="400" text-anchor="start" >低置信度保留原图；失败或缺页显式标记</text>
+<text x="1548" y="819" font-size="22" fill="#61748A" font-weight="400" text-anchor="start" >交互：文档结构送 05；原件与页图保存到 07。</text>
+<rect x="1548" y="835" width="604" height="84" rx="12" fill="#F2F5F9" stroke="none" stroke-width="1" />
+<text x="1564" y="867" font-size="21" fill="#61748A" font-weight="500" text-anchor="start" >CPU：4–8 vCPU；RAM：8–16GB</text>
+<text x="1564" y="900" font-size="21" fill="#61748A" font-weight="500" text-anchor="start" >GPU 非必需；加速时与主模型分时使用。</text>
+<rect x="81" y="1085" width="660" height="660" rx="23" fill="#DBE4EF" stroke="none" stroke-width="1" />
+<rect x="80" y="1080" width="660" height="660" rx="23" fill="#FFFFFF" stroke="#D8E2EE" stroke-width="1" />
+<rect x="80" y="1080" width="8" height="660" rx="4" fill="#3268CB" stroke="none" stroke-width="1" />
+<rect x="106" y="1105" width="52" height="48" rx="13" fill="#3268CB" stroke="none" stroke-width="1" />
+<text x="132" y="1139" font-size="25" fill="#FFFFFF" font-weight="700" text-anchor="middle" >08</text>
+<text x="176" y="1140" font-size="32" fill="#182D47" font-weight="650" text-anchor="start" >证据校验与报告</text>
+<text x="108" y="1183" font-size="21" fill="#61748A" font-weight="400" text-anchor="start" >程序校验 + 语义复核 · 格式化输出</text>
+<rect x="108.0" y="1212" width="178.66666666666666" height="52" rx="11" fill="#F0F5FC" stroke="none" stroke-width="1" />
+<text x="197.33333333333331" y="1246" font-size="23" fill="#3268CB" font-weight="550" text-anchor="middle" >回查依据</text>
+<path d="M 293.66666666666663 1238 H 313.66666666666663" fill="none" stroke="#3268CB" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#3268CB)"/>
+<rect x="320.66666666666663" y="1212" width="178.66666666666666" height="52" rx="11" fill="#F0F5FC" stroke="none" stroke-width="1" />
+<text x="409.99999999999994" y="1246" font-size="23" fill="#3268CB" font-weight="550" text-anchor="middle" >复核 / 去重</text>
+<path d="M 506.33333333333326 1238 H 526.3333333333333" fill="none" stroke="#3268CB" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#3268CB)"/>
+<rect x="533.3333333333333" y="1212" width="178.66666666666666" height="52" rx="11" fill="#F0F5FC" stroke="none" stroke-width="1" />
+<text x="622.6666666666666" y="1246" font-size="23" fill="#3268CB" font-weight="550" text-anchor="middle" >渲染报告</text>
+<text x="108" y="1311" font-size="24" fill="#20344D" font-weight="400" text-anchor="start" >原文片段确实存在，位置对应正确</text>
+<text x="108" y="1354" font-size="24" fill="#20344D" font-weight="400" text-anchor="start" >数值复算一致，证据能支持问题描述</text>
+<text x="108" y="1397" font-size="24" fill="#20344D" font-weight="400" text-anchor="start" >证据不足 → 待核实；覆盖不足 → 限定范围</text>
+<rect x="108" y="1435" width="604" height="155" rx="13" fill="#EDF3FC" stroke="none" stroke-width="1" />
+<text x="126" y="1469" font-size="25" fill="#3268CB" font-weight="650" text-anchor="start" >输出严格保持三个部分</text>
+<text x="126" y="1511" font-size="24" fill="#20344D" font-weight="400" text-anchor="start" >① 总体判断   ② 关键问题表</text>
+<text x="126" y="1550" font-size="24" fill="#20344D" font-weight="400" text-anchor="start" >③ 优先处理事项；支持中 / 英文</text>
+<text x="108" y="1610" font-size="22" fill="#61748A" font-weight="400" text-anchor="start" >交互：接收 05；回读 07；报告返回 01。</text>
+<rect x="108" y="1634" width="604" height="84" rx="12" fill="#F2F5F9" stroke="none" stroke-width="1" />
+<text x="124" y="1666" font-size="21" fill="#61748A" font-weight="500" text-anchor="start" >CPU：2 vCPU；RAM：2–4GB</text>
+<text x="124" y="1699" font-size="21" fill="#61748A" font-weight="500" text-anchor="start" >语义复核复用 06，无额外独立 GPU。</text>
+<rect x="801" y="1085" width="660" height="660" rx="23" fill="#CAD8E8" stroke="none" stroke-width="1" />
+<rect x="800" y="1080" width="660" height="660" rx="23" fill="#182D47" stroke="none" stroke-width="1" />
+<rect x="826" y="1105" width="52" height="48" rx="13" fill="#79B8F3" stroke="none" stroke-width="1" />
+<text x="852" y="1139" font-size="25" fill="#182D47" font-weight="700" text-anchor="middle" >05</text>
+<text x="896" y="1140" font-size="32" fill="#FFFFFF" font-weight="650" text-anchor="start" >评审 Agent 编排</text>
+<text x="828" y="1183" font-size="21" fill="#BDD0E6" font-weight="400" text-anchor="start" >LangGraph · 显式状态流程 + 受控工具调用</text>
+<rect x="828" y="1211" width="170" height="40" rx="10" fill="#304A68" stroke="none" stroke-width="1" />
+<text x="913.0" y="1239" font-size="22" fill="#EAF3FF" font-weight="500" text-anchor="middle" >识别评审条件</text>
+<rect x="1037" y="1211" width="170" height="40" rx="10" fill="#304A68" stroke="none" stroke-width="1" />
+<text x="1122.0" y="1239" font-size="22" fill="#EAF3FF" font-weight="500" text-anchor="middle" >逐章覆盖检查</text>
+<rect x="1246" y="1211" width="185" height="40" rx="10" fill="#304A68" stroke="none" stroke-width="1" />
+<text x="1338.5" y="1239" font-size="22" fill="#EAF3FF" font-weight="500" text-anchor="middle" >跨章节核对</text>
+<path d="M 1005 1231 H 1030" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#FFFFFF)"/>
+<path d="M 1214 1231 H 1239" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#FFFFFF)"/>
+<rect x="828" y="1286" width="288" height="89" rx="12" fill="#29435F" stroke="none" stroke-width="1" />
+<text x="846" y="1321" font-size="25" fill="#FFFFFF" font-weight="600" text-anchor="start" >结果可信度</text>
+<text x="846" y="1354" font-size="21" fill="#BDD0E6" font-weight="400" text-anchor="start" >实验条件 / 图表 / 数值</text>
+<rect x="1143" y="1286" width="288" height="89" rx="12" fill="#29435F" stroke="none" stroke-width="1" />
+<text x="1161" y="1321" font-size="25" fill="#FFFFFF" font-weight="600" text-anchor="start" >内容可靠性</text>
+<text x="1161" y="1354" font-size="21" fill="#BDD0E6" font-weight="400" text-anchor="start" >残留提示 / 文献 / 事实</text>
+<rect x="828" y="1395" width="288" height="89" rx="12" fill="#29435F" stroke="none" stroke-width="1" />
+<text x="846" y="1430" font-size="25" fill="#FFFFFF" font-weight="600" text-anchor="start" >规范与逻辑</text>
+<text x="846" y="1463" font-size="21" fill="#BDD0E6" font-weight="400" text-anchor="start" >引用归属 / 论证完整</text>
+<rect x="1143" y="1395" width="288" height="89" rx="12" fill="#29435F" stroke="none" stroke-width="1" />
+<text x="1161" y="1430" font-size="25" fill="#FFFFFF" font-weight="600" text-anchor="start" >创新与价值</text>
+<text x="1161" y="1463" font-size="21" fill="#BDD0E6" font-weight="400" text-anchor="start" >近邻工作 / 贡献证据</text>
+<text x="828" y="1534" font-size="23" fill="#E7F0FA" font-weight="400" text-anchor="start" >工具：局部原文 / 图像、检索、数值计算</text>
+<text x="828" y="1573" font-size="23" fill="#E7F0FA" font-weight="400" text-anchor="start" >按类型与学位调整尺度；记录未审范围</text>
+<text x="828" y="1612" font-size="23" fill="#E7F0FA" font-weight="400" text-anchor="start" >候选问题 + 证据 ID + 待核实状态 → 08</text>
+<rect x="828" y="1634" width="604" height="84" rx="12" fill="#29435F" stroke="none" stroke-width="1" />
+<text x="844" y="1666" font-size="21" fill="#C2D5E9" font-weight="500" text-anchor="start" >CPU：2–4 vCPU；RAM：4–8GB</text>
+<text x="844" y="1699" font-size="21" fill="#C2D5E9" font-weight="500" text-anchor="start" >本模块不持有模型；四维检查复用同一 06。</text>
+<rect x="1521" y="1085" width="660" height="660" rx="23" fill="#DBE4EF" stroke="none" stroke-width="1" />
+<rect x="1520" y="1080" width="660" height="660" rx="23" fill="#FFFFFF" stroke="#D8E2EE" stroke-width="1" />
+<rect x="1520" y="1080" width="8" height="660" rx="4" fill="#12877F" stroke="none" stroke-width="1" />
+<rect x="1546" y="1105" width="52" height="48" rx="13" fill="#12877F" stroke="none" stroke-width="1" />
+<text x="1572" y="1139" font-size="25" fill="#FFFFFF" font-weight="700" text-anchor="middle" >04</text>
+<text x="1616" y="1140" font-size="32" fill="#182D47" font-weight="650" text-anchor="start" >规范库与本地检索</text>
+<text x="1548" y="1183" font-size="21" fill="#61748A" font-weight="400" text-anchor="start" >考核要求 + 公开文献 · 独立命名空间</text>
+<rect x="1548.0" y="1212" width="178.66666666666666" height="52" rx="11" fill="#EDF7F5" stroke="none" stroke-width="1" />
+<text x="1637.3333333333333" y="1246" font-size="23" fill="#12877F" font-weight="550" text-anchor="middle" >导入资料</text>
+<path d="M 1733.6666666666667 1238 H 1753.6666666666667" fill="none" stroke="#12877F" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#12877F)"/>
+<rect x="1760.6666666666667" y="1212" width="178.66666666666666" height="52" rx="11" fill="#EDF7F5" stroke="none" stroke-width="1" />
+<text x="1850.0" y="1246" font-size="23" fill="#12877F" font-weight="550" text-anchor="middle" >核定 / 索引</text>
+<path d="M 1946.3333333333335 1238 H 1966.3333333333335" fill="none" stroke="#12877F" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#12877F)"/>
+<rect x="1973.3333333333333" y="1212" width="178.66666666666666" height="52" rx="11" fill="#EDF7F5" stroke="none" stroke-width="1" />
+<text x="2062.6666666666665" y="1246" font-size="23" fill="#12877F" font-weight="550" text-anchor="middle" >按范围检索</text>
+<text x="1548" y="1311" font-size="23" fill="#20344D" font-weight="400" text-anchor="start" >规范 PDF → 条款原文 → 管理员确认发布</text>
+<text x="1548" y="1354" font-size="23" fill="#20344D" font-weight="400" text-anchor="start" >按单位 / 年级 / 学位 / 生效日期筛选</text>
+<text x="1548" y="1397" font-size="23" fill="#20344D" font-weight="400" text-anchor="start" >关键词 + 本地向量检索，返回证据与出处</text>
+<rect x="1548" y="1435" width="604" height="155" rx="13" fill="#EDF7F5" stroke="none" stroke-width="1" />
+<text x="1566" y="1469" font-size="25" fill="#12877F" font-weight="650" text-anchor="start" >联网行为由模式决定</text>
+<text x="1566" y="1511" font-size="23" fill="#20344D" font-weight="400" text-anchor="start" >严格：只使用内网与预先同步的公开资料</text>
+<text x="1566" y="1550" font-size="23" fill="#20344D" font-weight="400" text-anchor="start" >受控：内网先审核查询，再交 09 复验</text>
+<text x="1548" y="1610" font-size="21" fill="#61748A" font-weight="400" text-anchor="start" >交互：向 05 提供依据；索引 / 资料持久化到 07。</text>
+<rect x="1548" y="1634" width="604" height="84" rx="12" fill="#F2F5F9" stroke="none" stroke-width="1" />
+<text x="1564" y="1666" font-size="21" fill="#61748A" font-weight="500" text-anchor="start" >CPU：2–4 vCPU；RAM：4–8GB</text>
+<text x="1564" y="1699" font-size="21" fill="#61748A" font-weight="500" text-anchor="start" >BGE-M3 等本地向量模型可先跑 CPU。</text>
+<rect x="81" y="1885" width="660" height="390" rx="23" fill="#DBE4EF" stroke="none" stroke-width="1" />
+<rect x="80" y="1880" width="660" height="390" rx="23" fill="#FFFFFF" stroke="#D8E2EE" stroke-width="1" />
+<rect x="80" y="1880" width="8" height="390" rx="4" fill="#8B9CAF" stroke="none" stroke-width="1" />
+<rect x="106" y="1905" width="52" height="48" rx="13" fill="#8B9CAF" stroke="none" stroke-width="1" />
+<text x="132" y="1939" font-size="25" fill="#FFFFFF" font-weight="700" text-anchor="middle" >07</text>
+<text x="176" y="1940" font-size="32" fill="#182D47" font-weight="650" text-anchor="start" >论文、证据与状态存储</text>
+<text x="108" y="1983" font-size="21" fill="#61748A" font-weight="400" text-anchor="start" >PostgreSQL + pgvector + 内网文件卷</text>
+<rect x="108.0" y="2008" width="178.66666666666666" height="52" rx="11" fill="#F0F5FC" stroke="none" stroke-width="1" />
+<text x="197.33333333333331" y="2042" font-size="23" fill="#3268CB" font-weight="550" text-anchor="middle" >版本 / 哈希</text>
+<path d="M 293.66666666666663 2034 H 313.66666666666663" fill="none" stroke="#3268CB" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#3268CB)"/>
+<rect x="320.66666666666663" y="2008" width="178.66666666666666" height="52" rx="11" fill="#F0F5FC" stroke="none" stroke-width="1" />
+<text x="409.99999999999994" y="2042" font-size="23" fill="#3268CB" font-weight="550" text-anchor="middle" >分区保存</text>
+<path d="M 506.33333333333326 2034 H 526.3333333333333" fill="none" stroke="#3268CB" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#3268CB)"/>
+<rect x="533.3333333333333" y="2008" width="178.66666666666666" height="52" rx="11" fill="#F0F5FC" stroke="none" stroke-width="1" />
+<text x="622.6666666666666" y="2042" font-size="23" fill="#3268CB" font-weight="550" text-anchor="middle" >按权限读取</text>
+<text x="108" y="2103" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >原件 / 解析块 / 规范 / 公开文献分开管理</text>
+<text x="108" y="2139" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >证据位置、任务检查点、报告版本可追溯</text>
+<text x="108" y="2175" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >交互：02 / 03 / 04 / 05 / 08 共用数据接口。</text>
+<rect x="108" y="2191" width="604" height="51" rx="12" fill="#F2F5F9" stroke="none" stroke-width="1" />
+<text x="124" y="2223" font-size="21" fill="#61748A" font-weight="500" text-anchor="start" >CPU：2–4 vCPU；RAM：8–16GB；SSD 按保留期扩容</text>
+<rect x="801" y="1885" width="660" height="390" rx="23" fill="#DBE4EF" stroke="none" stroke-width="1" />
+<rect x="800" y="1880" width="660" height="390" rx="23" fill="#FFFFFF" stroke="#D8E2EE" stroke-width="1" />
+<rect x="800" y="1880" width="8" height="390" rx="4" fill="#12877F" stroke="none" stroke-width="1" />
+<rect x="826" y="1905" width="52" height="48" rx="13" fill="#12877F" stroke="none" stroke-width="1" />
+<text x="852" y="1939" font-size="25" fill="#FFFFFF" font-weight="700" text-anchor="middle" >06</text>
+<text x="896" y="1940" font-size="32" fill="#182D47" font-weight="650" text-anchor="start" >内网模型服务 · A100</text>
+<text x="828" y="1983" font-size="21" fill="#61748A" font-weight="400" text-anchor="start" >vLLM · Qwen3.5-27B 为首轮候选</text>
+<rect x="828.0" y="2008" width="178.66666666666666" height="52" rx="11" fill="#EDF7F5" stroke="none" stroke-width="1" />
+<text x="917.3333333333334" y="2042" font-size="23" fill="#12877F" font-weight="550" text-anchor="middle" >兼容接口</text>
+<path d="M 1013.6666666666666 2034 H 1033.6666666666665" fill="none" stroke="#12877F" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#12877F)"/>
+<rect x="1040.6666666666667" y="2008" width="178.66666666666666" height="52" rx="11" fill="#EDF7F5" stroke="none" stroke-width="1" />
+<text x="1130.0" y="2042" font-size="23" fill="#12877F" font-weight="550" text-anchor="middle" >文本 / 图像推理</text>
+<path d="M 1226.3333333333335 2034 H 1246.3333333333335" fill="none" stroke="#12877F" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#12877F)"/>
+<rect x="1253.3333333333333" y="2008" width="178.66666666666666" height="52" rx="11" fill="#EDF7F5" stroke="none" stroke-width="1" />
+<text x="1342.6666666666665" y="2042" font-size="23" fill="#12877F" font-weight="550" text-anchor="middle" >结构化返回</text>
+<text x="828" y="2104" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >A100 40GB：先验证 GPTQ Int4 与有限上下文</text>
+<text x="828" y="2140" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >A100 80GB：先验证 BF16；仍按章节执行</text>
+<text x="828" y="2176" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >工具调用 + JSON 约束；失败不回退云模型</text>
+<rect x="828" y="2191" width="604" height="51" rx="12" fill="#F2F5F9" stroke="none" stroke-width="1" />
+<text x="844" y="2223" font-size="21" fill="#61748A" font-weight="500" text-anchor="start" >单张 GPU 共享；主机 RAM 64–128GB；CPU 4–8 vCPU</text>
+<rect x="1520" y="1880" width="660" height="390" rx="22" fill="#E5EDF7" stroke="#CCD9E9" stroke-width="1" />
+<text x="1548" y="1928" font-size="29" fill="#182D47" font-weight="650" text-anchor="start" >单卡运行顺序与资源边界</text>
+<rect x="1548.0" y="1962" width="178.66666666666666" height="52" rx="11" fill="#F0F5FC" stroke="none" stroke-width="1" />
+<text x="1637.3333333333333" y="1996" font-size="23" fill="#3268CB" font-weight="550" text-anchor="middle" >CPU 解析</text>
+<path d="M 1733.6666666666667 1988 H 1753.6666666666667" fill="none" stroke="#3268CB" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#3268CB)"/>
+<rect x="1760.6666666666667" y="1962" width="178.66666666666666" height="52" rx="11" fill="#F0F5FC" stroke="none" stroke-width="1" />
+<text x="1850.0" y="1996" font-size="23" fill="#3268CB" font-weight="550" text-anchor="middle" >GPU 评审</text>
+<path d="M 1946.3333333333335 1988 H 1966.3333333333335" fill="none" stroke="#3268CB" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#3268CB)"/>
+<rect x="1973.3333333333333" y="1962" width="178.66666666666666" height="52" rx="11" fill="#F0F5FC" stroke="none" stroke-width="1" />
+<text x="2062.6666666666665" y="1996" font-size="23" fill="#3268CB" font-weight="550" text-anchor="middle" >CPU 输出</text>
+<text x="1548" y="2057" font-size="23" fill="#20344D" font-weight="400" text-anchor="start" >多个任务可排队，先从 1 个 GPU 执行槽起步</text>
+<text x="1548" y="2098" font-size="23" fill="#20344D" font-weight="400" text-anchor="start" >OCR / 向量化优先 CPU，按需再做 GPU 加速</text>
+<text x="1548" y="2139" font-size="23" fill="#20344D" font-weight="400" text-anchor="start" >显存预算包括权重、缓存、图像与运行时开销</text>
+<text x="1548" y="2180" font-size="23" fill="#20344D" font-weight="400" text-anchor="start" >不直接加载整篇超长上下文；限制图片数量</text>
+<text x="1548" y="2234" font-size="21" fill="#61748A" font-weight="400" text-anchor="start" >硬件配置是规划起点，需实测吞吐与峰值显存。</text>
+<rect x="2300" y="470" width="770" height="470" rx="22" fill="#FFFFFF" stroke="#E9D7BC" stroke-width="1" />
+<rect x="2326" y="495" width="162" height="40" rx="10" fill="#FAEAD2" stroke="none" stroke-width="1" />
+<text x="2407.0" y="523" font-size="21" fill="#875018" font-weight="500" text-anchor="middle" >公共互联网</text>
+<text x="2516" y="530" font-size="31" fill="#875018" font-weight="650" text-anchor="start" >仅检索公开资料</text>
+<text x="2328" y="574" font-size="23" fill="#61748A" font-weight="400" text-anchor="start" >外部数据源不接触论文文件或内部模型上下文</text>
+<rect x="2328.0" y="608" width="215.33333333333334" height="52" rx="11" fill="#F0F5FC" stroke="none" stroke-width="1" />
+<text x="2435.6666666666665" y="642" font-size="23" fill="#3268CB" font-weight="550" text-anchor="middle" >学术元数据</text>
+<path d="M 2550.3333333333335 634 H 2570.3333333333335" fill="none" stroke="#3268CB" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#3268CB)"/>
+<rect x="2577.3333333333335" y="608" width="215.33333333333334" height="52" rx="11" fill="#F0F5FC" stroke="none" stroke-width="1" />
+<text x="2685.0" y="642" font-size="23" fill="#3268CB" font-weight="550" text-anchor="middle" >官方原始来源</text>
+<path d="M 2799.666666666667 634 H 2819.666666666667" fill="none" stroke="#3268CB" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#3268CB)"/>
+<rect x="2826.6666666666665" y="608" width="215.33333333333334" height="52" rx="11" fill="#F0F5FC" stroke="none" stroke-width="1" />
+<text x="2934.333333333333" y="642" font-size="23" fill="#3268CB" font-weight="550" text-anchor="middle" >获取网页 / 全文</text>
+<text x="2328" y="712" font-size="24" fill="#20344D" font-weight="400" text-anchor="start" >Crossref：DOI、题名、作者、出版信息</text>
+<text x="2328" y="755" font-size="24" fill="#20344D" font-weight="400" text-anchor="start" >SearXNG：受控网页搜索入口</text>
+<text x="2328" y="798" font-size="24" fill="#20344D" font-weight="400" text-anchor="start" >出版方 / 会议 / 预印本 / 项目官网：原始证据</text>
+<rect x="2328" y="838" width="714" height="74" rx="12" fill="#FFF3E3" stroke="none" stroke-width="1" />
+<text x="2346" y="868" font-size="23" fill="#8D591F" font-weight="550" text-anchor="start" >外部提供方仍能看到获准发送的查询词。</text>
+<text x="2346" y="898" font-size="22" fill="#8D591F" font-weight="400" text-anchor="start" >自建搜索入口 ≠ 查询不出网。</text>
+<rect x="2301" y="1085" width="770" height="660" rx="23" fill="#DBE4EF" stroke="none" stroke-width="1" />
+<rect x="2300" y="1080" width="770" height="660" rx="23" fill="#FFFFFF" stroke="#D8E2EE" stroke-width="1" />
+<rect x="2300" y="1080" width="8" height="660" rx="4" fill="#C17726" stroke="none" stroke-width="1" />
+<rect x="2326" y="1105" width="52" height="48" rx="13" fill="#C17726" stroke="none" stroke-width="1" />
+<text x="2352" y="1139" font-size="25" fill="#FFFFFF" font-weight="700" text-anchor="middle" >09</text>
+<text x="2396" y="1140" font-size="32" fill="#182D47" font-weight="650" text-anchor="start" >受控联网网关</text>
+<text x="2328" y="1183" font-size="21" fill="#61748A" font-weight="400" text-anchor="start" >隔离服务 · 策略执行 · 外部证据清洗</text>
+<rect x="2328.0" y="1212" width="215.33333333333334" height="52" rx="11" fill="#F0F5FC" stroke="none" stroke-width="1" />
+<text x="2435.6666666666665" y="1246" font-size="23" fill="#3268CB" font-weight="550" text-anchor="middle" >已释放查询</text>
+<path d="M 2550.3333333333335 1238 H 2570.3333333333335" fill="none" stroke="#3268CB" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#3268CB)"/>
+<rect x="2577.3333333333335" y="1212" width="215.33333333333334" height="52" rx="11" fill="#F0F5FC" stroke="none" stroke-width="1" />
+<text x="2685.0" y="1246" font-size="23" fill="#3268CB" font-weight="550" text-anchor="middle" >规则复验</text>
+<path d="M 2799.666666666667 1238 H 2819.666666666667" fill="none" stroke="#3268CB" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#3268CB)"/>
+<rect x="2826.6666666666665" y="1212" width="215.33333333333334" height="52" rx="11" fill="#F0F5FC" stroke="none" stroke-width="1" />
+<text x="2934.333333333333" y="1246" font-size="23" fill="#3268CB" font-weight="550" text-anchor="middle" >允许或阻断</text>
+<text x="2328" y="1313" font-size="24" fill="#20344D" font-weight="400" text-anchor="start" >允许：批准的公开标识与通用查询</text>
+<text x="2328" y="1356" font-size="24" fill="#20344D" font-weight="400" text-anchor="start" >禁止：原文、内部项目名、实验数值、图像</text>
+<text x="2328" y="1399" font-size="24" fill="#20344D" font-weight="400" text-anchor="start" >策略不确定 → 返回内网审核；失败显式标记</text>
+<rect x="2328" y="1435" width="714" height="155" rx="13" fill="#FFF3E3" stroke="none" stroke-width="1" />
+<text x="2346" y="1470" font-size="25" fill="#875018" font-weight="650" text-anchor="start" >返回证据而非外部生成的评审意见</text>
+<text x="2346" y="1511" font-size="23" fill="#20344D" font-weight="400" text-anchor="start" >限制域名 / 重定向 / 参数 / 频率；阻断内网访问</text>
+<text x="2346" y="1550" font-size="23" fill="#20344D" font-weight="400" text-anchor="start" >清洗网页 → 保存 URL、时间、版本与证据片段</text>
+<text x="2328" y="1610" font-size="22" fill="#61748A" font-weight="400" text-anchor="start" >交互：复验 04 的批准查询；公开证据回到 04 / 07。</text>
+<rect x="2328" y="1634" width="714" height="84" rx="12" fill="#F2F5F9" stroke="none" stroke-width="1" />
+<text x="2344" y="1666" font-size="21" fill="#61748A" font-weight="500" text-anchor="start" >独立主机 / VM：2–4 vCPU；4–8GB RAM；无 GPU</text>
+<text x="2344" y="1699" font-size="21" fill="#61748A" font-weight="500" text-anchor="start" >严格模式下：拒绝任何由当前论文产生的出网查询。</text>
+<rect x="2300" y="1810" width="770" height="460" rx="22" fill="#FFFFFF" stroke="#E9D7BC" stroke-width="1" />
+<text x="2328" y="1857" font-size="28" fill="#875018" font-weight="650" text-anchor="start" >两种模式共用架构，出网策略不同</text>
+<rect x="2325" y="1883" width="720" height="161" rx="13" fill="#EEF7F1" stroke="none" stroke-width="1" />
+<text x="2344" y="1921" font-size="25" fill="#2A8A62" font-weight="700" text-anchor="start" >A  严格隔离</text>
+<text x="2344" y="1959" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >预设公开资料 → 单向导入 04 → 内网评审</text>
+<text x="2344" y="1993" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >同步范围与具体论文无关；当前论文不触发公网请求</text>
+<text x="2344" y="2027" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >能力边界：新近工作判断受本地资料覆盖范围限制</text>
+<rect x="2325" y="2064" width="720" height="171" rx="13" fill="#FFF3E3" stroke="none" stroke-width="1" />
+<text x="2344" y="2103" font-size="25" fill="#A26521" font-weight="700" text-anchor="start" >B  受控联网</text>
+<text x="2344" y="2141" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >05 → 04 → 09 → 公网 → 公开证据回到 04 / 07</text>
+<text x="2344" y="2175" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >内网审核后释放查询，网关复验；禁止论文上下文</text>
+<text x="2344" y="2209" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >剩余风险：查询及其组合仍可能透露研究方向</text>
+<rect x="70" y="2358" width="3020" height="153" rx="20" fill="#182D47" stroke="none" stroke-width="1" />
+<rect x="92" y="2380" width="50" height="46" rx="12" fill="#647F9D" stroke="none" stroke-width="1" />
+<text x="117" y="2412" font-size="24" fill="#FFFFFF" font-weight="700" text-anchor="middle" >10</text>
+<text x="160" y="2413" font-size="30" fill="#FFFFFF" font-weight="650" text-anchor="start" >安全、审计与运维</text>
+<text x="500" y="2413" font-size="24" fill="#BDD0E6" font-weight="400" text-anchor="start" >贯穿全部模块｜依靠网络与程序策略强制执行</text>
+<text x="97" y="2456" font-size="25" fill="#ECF3FB" font-weight="400" text-anchor="start" >身份 / 权限 → 文件与任务隔离 → 禁止默认出网 → 本地审计 → 保留期与删除 → 故障告警</text>
+<text x="97" y="2491" font-size="23" fill="#BDD0E6" font-weight="400" text-anchor="start" >预算：1–2 vCPU / 2–4GB RAM（共享）；所有镜像与权重预先导入；关闭外部遥测、云端追踪与自动下载。</text>
+<path d="M 80 2555 H 140" fill="none" stroke="#3268CB" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#3268CB)"/>
+<text x="157" y="2562" font-size="22" fill="#61748A" font-weight="400" text-anchor="start" >评审主流程</text>
+<path d="M 460 2555 H 520" fill="none" stroke="#12877F" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#12877F)"/>
+<text x="537" y="2562" font-size="22" fill="#61748A" font-weight="400" text-anchor="start" >内网检索 / 模型调用</text>
+<path d="M 1020 2555 H 1080" fill="none" stroke="#8B9CAF" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#8B9CAF)" stroke-dasharray="8 6"/>
+<text x="1097" y="2562" font-size="22" fill="#61748A" font-weight="400" text-anchor="start" >证据持久化</text>
+<path d="M 1460 2555 H 1520" fill="none" stroke="#C17726" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#C17726)"/>
+<text x="1537" y="2562" font-size="22" fill="#61748A" font-weight="400" text-anchor="start" >受控模式出网查询</text>
+<path d="M 2030 2555 H 2090" fill="none" stroke="#2A8A62" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#2A8A62)"/>
+<text x="2107" y="2562" font-size="22" fill="#61748A" font-weight="400" text-anchor="start" >公开证据入网</text>
+<text x="80" y="2604" font-size="22" fill="#61748A" font-weight="400" text-anchor="start" >阅读方式：先看 01 → 02 → 03 → 05 → 08；再看 05 调用 04 / 06，07 统一留存证据。箭头仅展示关键路径，交互说明补充共享访问。</text>
+<text x="80" y="2644" font-size="20" fill="#61748A" font-weight="400" text-anchor="start" >依据：</text>
+<a href="https://docs.langchain.com/oss/python/langgraph/overview" xlink:href="https://docs.langchain.com/oss/python/langgraph/overview" target="_blank">
+<text x="145" y="2644" font-size="20" fill="#3268CB" font-weight="500" text-anchor="start" text-decoration="underline">LangGraph</text>
+</a>
+<a href="https://docs.vllm.ai/en/latest/features/quantization/" xlink:href="https://docs.vllm.ai/en/latest/features/quantization/" target="_blank">
+<text x="298" y="2644" font-size="20" fill="#3268CB" font-weight="500" text-anchor="start" text-decoration="underline">vLLM</text>
+</a>
+<a href="https://huggingface.co/Qwen/Qwen3.5-27B" xlink:href="https://huggingface.co/Qwen/Qwen3.5-27B" target="_blank">
+<text x="391" y="2644" font-size="20" fill="#3268CB" font-weight="500" text-anchor="start" text-decoration="underline">Qwen3.5-27B</text>
+</a>
+<a href="https://docling-project.github.io/docling/" xlink:href="https://docling-project.github.io/docling/" target="_blank">
+<text x="568" y="2644" font-size="20" fill="#3268CB" font-weight="500" text-anchor="start" text-decoration="underline">Docling</text>
+</a>
+<a href="https://www.crossref.org/documentation/retrieve-metadata/rest-api/" xlink:href="https://www.crossref.org/documentation/retrieve-metadata/rest-api/" target="_blank">
+<text x="697" y="2644" font-size="20" fill="#3268CB" font-weight="500" text-anchor="start" text-decoration="underline">Crossref</text>
+</a>
+<a href="https://docs.searxng.org/user/about.html" xlink:href="https://docs.searxng.org/user/about.html" target="_blank">
+<text x="838" y="2644" font-size="20" fill="#3268CB" font-weight="500" text-anchor="start" text-decoration="underline">SearXNG</text>
+</a>
+<text x="3090" y="2644" font-size="20" fill="#61748A" font-weight="400" text-anchor="end" >架构草案 · 资源为估算，未进行部署压测</text>
+</g>
+<g font-family="Arial, PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">
+<rect x="0" y="2700" width="3160" height="3220" rx="0" fill="#F7F9FC" stroke="none" stroke-width="1" />
+<rect x="70" y="2730" width="3020" height="126" rx="20" fill="#182D47" stroke="none" stroke-width="1" />
+<text x="100" y="2780" font-size="36" fill="#FFFFFF" font-weight="650" text-anchor="start" >接口与通信详图</text>
+<text x="100" y="2821" font-size="24" fill="#CBDCED" font-weight="400" text-anchor="start" >当前 demo：网页 + FastAPI + 串行队列 + LangGraph 四节点 + 本地文件。HTTP 路由前缀 /api/v1；下文区分实现与规划。</text>
+<rect x="70" y="2895" width="470" height="125" rx="16" fill="#FFFFFF" stroke="#D7E1EC" stroke-width="1" />
+<text x="92" y="2941" font-size="27" fill="#182D47" font-weight="650" text-anchor="start" >01 网页</text>
+<text x="92" y="2982" font-size="22" fill="#12877F" font-weight="400" text-anchor="start" >HTTP / JSON 或 multipart</text>
+<path d="M 544 2954 H 572" fill="none" stroke="#3268CB" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#3268CB)"/>
+<rect x="580" y="2895" width="470" height="125" rx="16" fill="#FFFFFF" stroke="#D7E1EC" stroke-width="1" />
+<text x="602" y="2941" font-size="27" fill="#182D47" font-weight="650" text-anchor="start" >02 接口与调度</text>
+<text x="602" y="2982" font-size="22" fill="#12877F" font-weight="400" text-anchor="start" >submit → 排队 / 202</text>
+<path d="M 1054 2954 H 1082" fill="none" stroke="#3268CB" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#3268CB)"/>
+<rect x="1090" y="2895" width="470" height="125" rx="16" fill="#FFFFFF" stroke="#D7E1EC" stroke-width="1" />
+<text x="1112" y="2941" font-size="27" fill="#182D47" font-weight="650" text-anchor="start" >05 LangGraph</text>
+<text x="1112" y="2982" font-size="22" fill="#12877F" font-weight="400" text-anchor="start" >graph.invoke(job_id, request)</text>
+<path d="M 1564 2954 H 1592" fill="none" stroke="#3268CB" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#3268CB)"/>
+<rect x="1600" y="2895" width="470" height="125" rx="16" fill="#FFFFFF" stroke="#D7E1EC" stroke-width="1" />
+<text x="1622" y="2941" font-size="27" fill="#182D47" font-weight="650" text-anchor="start" >parse → review</text>
+<text x="1622" y="2982" font-size="22" fill="#12877F" font-weight="400" text-anchor="start" >03 提取 → 06 assess</text>
+<path d="M 2074 2954 H 2102" fill="none" stroke="#3268CB" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#3268CB)"/>
+<rect x="2110" y="2895" width="470" height="125" rx="16" fill="#FFFFFF" stroke="#D7E1EC" stroke-width="1" />
+<text x="2132" y="2941" font-size="27" fill="#182D47" font-weight="650" text-anchor="start" >verify → report</text>
+<text x="2132" y="2982" font-size="22" fill="#12877F" font-weight="400" text-anchor="start" >08 引文校验 → 渲染</text>
+<path d="M 2584 2954 H 2612" fill="none" stroke="#3268CB" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#3268CB)"/>
+<rect x="2620" y="2895" width="470" height="125" rx="16" fill="#FFFFFF" stroke="#D7E1EC" stroke-width="1" />
+<text x="2642" y="2941" font-size="27" fill="#182D47" font-weight="650" text-anchor="start" >07 发布报告</text>
+<text x="2642" y="2982" font-size="22" fill="#12877F" font-weight="400" text-anchor="start" >JSON / MD → 完成状态</text>
+<rect x="70" y="3050" width="3020" height="65" rx="12" fill="#E8F1EB" stroke="none" stroke-width="1" />
+<text x="100" y="3092" font-size="25" fill="#12877F" font-weight="550" text-anchor="start" >图：START → parse → review → verify → report → END；节点共享 ReviewState；07 保存五个任务文件，01 每 1.5 秒轮询。</text>
+<rect x="70" y="3150" width="1470" height="1030" rx="20" fill="#FFFFFF" stroke="#D5DFEB" stroke-width="1" />
+<text x="96" y="3198" font-size="29" fill="#182D47" font-weight="650" text-anchor="start" >A  已实现 HTTP 接口</text>
+<text x="96" y="3236" font-size="21" fill="#61748A" font-weight="400" text-anchor="start" >UTF-8；成功返回 JSON，content / download 返回文件；ID 使用上传／创建响应</text>
+<text x="96" y="3282" font-size="23" fill="#3268CB" font-weight="600" text-anchor="start" >GET /config</text>
+<text x="96" y="3314" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >能力信息：本地模型是否配置、OCR=false、存储类型与版本</text>
+<text x="96" y="3352" font-size="23" fill="#3268CB" font-weight="600" text-anchor="start" >POST /documents</text>
+<text x="96" y="3384" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >multipart：file + role=primary/policy → 201 Document；≤30MiB</text>
+<text x="96" y="3422" font-size="23" fill="#3268CB" font-weight="600" text-anchor="start" >POST /documents/text</text>
+<text x="96" y="3454" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >JSON：title + text → 201 Document；原文保存为 TXT</text>
+<text x="96" y="3492" font-size="23" fill="#3268CB" font-weight="600" text-anchor="start" >GET /documents</text>
+<text x="96" y="3524" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >200 Document[]；创建时间倒序；前端选择已保存规范</text>
+<text x="96" y="3562" font-size="23" fill="#3268CB" font-weight="600" text-anchor="start" >GET /documents/{id}/content</text>
+<text x="96" y="3594" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >200 原件下载；不暴露存储绝对路径</text>
+<text x="96" y="3632" font-size="23" fill="#3268CB" font-weight="600" text-anchor="start" >POST /jobs</text>
+<text x="96" y="3664" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >ReviewRequest → 202 queued JobState；后台异步串行执行</text>
+<text x="96" y="3702" font-size="23" fill="#3268CB" font-weight="600" text-anchor="start" >GET /jobs  ·  GET /jobs/{id}</text>
+<text x="96" y="3734" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >200 JobState[] / JobState；轮询状态与阶段</text>
+<text x="96" y="3772" font-size="23" fill="#3268CB" font-weight="600" text-anchor="start" >POST /jobs/{id}/cancel</text>
+<text x="96" y="3804" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >200 当前状态；取消阻止后续发布，已发请求可能仍在执行</text>
+<text x="96" y="3842" font-size="23" fill="#3268CB" font-weight="600" text-anchor="start" >GET /jobs/{id}/content</text>
+<text x="96" y="3874" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >200 blocks + policies + warnings；用于展开来源原文</text>
+<text x="96" y="3912" font-size="23" fill="#3268CB" font-weight="600" text-anchor="start" >GET /jobs/{id}/report</text>
+<text x="96" y="3944" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >200 Report；仅 completed / partial 可读，未发布为 409</text>
+<text x="96" y="3982" font-size="23" fill="#3268CB" font-weight="600" text-anchor="start" >GET /jobs/{id}/download</text>
+<text x="96" y="4014" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >200 review-report.md；和报告相同的发布条件</text>
+<text x="96" y="4052" font-size="23" fill="#3268CB" font-weight="600" text-anchor="start" >POST /search</text>
+<text x="96" y="4084" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >query + approved=true → 200 SearchRecord；未批准为 403</text>
+<text x="96" y="4139" font-size="22" fill="#61748A" font-weight="400" text-anchor="start" >在线契约：/docs 与 /openapi.json；当前无分页、SSE、幂等键或 Run。</text>
+<rect x="1590" y="3150" width="1500" height="1030" rx="20" fill="#FFFFFF" stroke="#D5DFEB" stroke-width="1" />
+<text x="1616" y="3198" font-size="29" fill="#182D47" font-weight="650" text-anchor="start" >B  已实现模块调用与输入输出</text>
+<text x="1616" y="3236" font-size="21" fill="#61748A" font-weight="400" text-anchor="start" >同一后端进程内调用 Python 接口；模型与公网查询通过 HTTP 访问</text>
+<text x="1616" y="3282" font-size="23" fill="#3268CB" font-weight="600" text-anchor="start" >02 → 07  Store.save_document(filename, bytes, role)</text>
+<text x="1616" y="3314" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >输出 Document；原件 + document.json，文件 ID 与 SHA-256</text>
+<text x="1616" y="3376" font-size="23" fill="#3268CB" font-weight="600" text-anchor="start" >02 → 05  submit → worker.run → graph.invoke({job_id, request})</text>
+<text x="1616" y="3408" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >保存 request / state；图编译一次，每次调用独立状态，不启用检查点</text>
+<text x="1616" y="3470" font-size="23" fill="#3268CB" font-weight="600" text-anchor="start" >05.parse → 03  parse_document(store, document_id)</text>
+<text x="1616" y="3502" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >返回 blocks / policies / warnings；写 content.json；无正文即失败</text>
+<text x="1616" y="3564" font-size="23" fill="#3268CB" font-weight="600" text-anchor="start" >05.review → 06  MockReviewer / LocalReviewer.assess(...)</text>
+<text x="1616" y="3596" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >request + blocks + policies → Assessment；没有动态工具调用循环</text>
+<text x="1616" y="3658" font-size="23" fill="#3268CB" font-weight="600" text-anchor="start" >05.verify → 08  validate_evidence(assessment, blocks)</text>
+<text x="1616" y="3690" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >返回 findings；验证 block_id 与原文子串，失败交回 service 标记 failed</text>
+<text x="1616" y="3752" font-size="23" fill="#3268CB" font-weight="600" text-anchor="start" >05.report → 08  组装 Report → markdown(report)</text>
+<text x="1616" y="3784" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >补充位置、覆盖与限制；输出 Markdown；未做语义、统计与创新复核</text>
+<text x="1616" y="3846" font-size="23" fill="#3268CB" font-weight="600" text-anchor="start" >05 → 02.advance / 07.Store  阶段更新、取消与发布</text>
+<text x="1616" y="3878" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >每节点检查取消，发布前锁内复查；写完 JSON / MD 后更新终态</text>
+<text x="1616" y="3940" font-size="23" fill="#3268CB" font-weight="600" text-anchor="start" >01 → 02 → 09  search_public(query)</text>
+<text x="1616" y="3972" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >用户手动批准 → Crossref HTTPS → 最多5条书目信息 → 保存</text>
+<text x="1616" y="4034" font-size="23" fill="#3268CB" font-weight="600" text-anchor="start" >全部后台阶段 → 10  logging.exception</text>
+<text x="1616" y="4066" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >Job ID + 堆栈输出到控制台；错误同时写 state.error</text>
+<text x="1616" y="4139" font-size="22" fill="#61748A" font-weight="400" text-anchor="start" >run 关闭云端追踪；ReviewCancelled 正常停止，其他异常记录失败。</text>
+<rect x="70" y="4220" width="1470" height="430" rx="20" fill="#FFFFFF" stroke="#D5DFEB" stroke-width="1" />
+<text x="96" y="4268" font-size="29" fill="#182D47" font-weight="650" text-anchor="start" >C  模型协议：本地适配已实现，GPU 服务待部署</text>
+<text x="96" y="4306" font-size="21" fill="#61748A" font-weight="400" text-anchor="start" >HTTP POST {MODEL_BASE_URL}/chat/completions；超时 180 秒</text>
+<text x="98" y="4350" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >Headers：Content-Type: application/json；可选 Authorization: Bearer …</text>
+<text x="98" y="4389" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >Body：model、temperature=0.1、messages=[system, user]、</text>
+<text x="98" y="4428" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >            response_format={&quot;type&quot;:&quot;json_object&quot;}</text>
+<text x="98" y="4467" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >user 内容：request、blocks、policies、output_schema 的 JSON 字符串</text>
+<text x="98" y="4506" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >输出：choices[0].message.content → Assessment；不支持 tool_calls</text>
+<text x="98" y="4545" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >输入超过 60,000 字符拒绝处理，不截断；模式和模型名称写入报告</text>
+<text x="98" y="4584" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >Assessment：verdict、summary、findings[]、priority_actions[]</text>
+<rect x="1590" y="4220" width="1500" height="430" rx="20" fill="#FFFFFF" stroke="#D5DFEB" stroke-width="1" />
+<text x="1616" y="4268" font-size="29" fill="#182D47" font-weight="650" text-anchor="start" >D  联网协议：当前手工查询与目标隔离网关</text>
+<text x="1616" y="4306" font-size="21" fill="#61748A" font-weight="400" text-anchor="start" >当前 approved 布尔值不是生产环境的身份授权；查询与论文任务独立</text>
+<text x="1618" y="4350" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >当前：POST /search → GET https://api.crossref.org/works</text>
+<text x="1618" y="4389" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >参数：query.bibliographic=&lt;URL编码查询&gt; &amp; rows=5；超时20秒</text>
+<text x="1618" y="4428" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >结果：title、doi、url、scope=metadata_only；不自动写入论文报告</text>
+<text x="1618" y="4467" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >目标：内网提出草稿 → 批准精确查询 → 独立网关验证签名凭据</text>
+<text x="1618" y="4506" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >网关请求：随机 request_id、query、allowed_domains、max_results、</text>
+<text x="1618" y="4545" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >                  release_token；不传论文、内部身份或未批准草稿</text>
+<text x="1618" y="4584" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >严格模式不允许当前论文触发公网请求；预设资料同步独立运行</text>
+<rect x="70" y="4690" width="1470" height="580" rx="20" fill="#FFFFFF" stroke="#D5DFEB" stroke-width="1" />
+<text x="96" y="4738" font-size="29" fill="#182D47" font-weight="650" text-anchor="start" >E  本地存储字段与可追溯关系</text>
+<text x="96" y="4776" font-size="21" fill="#61748A" font-weight="400" text-anchor="start" >当前 DATA_ROOT 默认代码目录 data/；每份材料2个文件，每次任务最多5个文件</text>
+<text x="98" y="4821" font-size="23" fill="#3268CB" font-weight="600" text-anchor="start" >documents/&lt;id&gt;/document.json + source.ext</text>
+<text x="98" y="4853" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >id、filename、suffix、role、size_bytes、sha256、created_at</text>
+<text x="98" y="4891" font-size="23" fill="#3268CB" font-weight="600" text-anchor="start" >jobs/&lt;id&gt;/request.json + state.json</text>
+<text x="98" y="4923" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >材料／规范ID、尺度、语言、提示词、模式；状态／阶段／时间／错误</text>
+<text x="98" y="4961" font-size="23" fill="#3268CB" font-weight="600" text-anchor="start" >jobs/&lt;id&gt;/content.json</text>
+<text x="98" y="4993" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >blocks、policies、warnings；Block=id/document_id/filename/location/text</text>
+<text x="98" y="5031" font-size="23" fill="#3268CB" font-weight="600" text-anchor="start" >jobs/&lt;id&gt;/report.json + report.md</text>
+<text x="98" y="5063" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >判断、问题、引文、建议、模式、模型名、生成时间、覆盖统计与限制</text>
+<text x="98" y="5101" font-size="23" fill="#3268CB" font-weight="600" text-anchor="start" >Finding：block_id + quote → content.json 中的原文</text>
+<text x="98" y="5133" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >dimension、severity、status、issue、suggestion；补充文件名与位置</text>
+<text x="98" y="5171" font-size="23" fill="#3268CB" font-weight="600" text-anchor="start" >searches/&lt;id&gt;.json</text>
+<text x="98" y="5203" font-size="22" fill="#20344D" font-weight="400" text-anchor="start" >id、query、approved、created_at、results；公开元数据，不是全文核验</text>
+<rect x="1590" y="4690" width="1500" height="580" rx="20" fill="#FFFFFF" stroke="#D5DFEB" stroke-width="1" />
+<text x="1616" y="4738" font-size="29" fill="#182D47" font-weight="650" text-anchor="start" >F  状态、失败与精简部署边界</text>
+<text x="1616" y="4776" font-size="21" fill="#61748A" font-weight="400" text-anchor="start" >任务执行状态不等于论文结论；报告中的“信息不足”可以是正常业务结果</text>
+<text x="1618" y="4821" font-size="23" fill="#20344D" font-weight="400" text-anchor="start" >正常：queued → running → completed / partial</text>
+<text x="1618" y="4864" font-size="23" fill="#20344D" font-weight="400" text-anchor="start" >阶段：queued → parsing → reviewing → verifying → reporting</text>
+<text x="1618" y="4907" font-size="23" fill="#20344D" font-weight="400" text-anchor="start" >异常：failed；取消：cancelled；启动发现未完成任务：interrupted</text>
+<text x="1618" y="4950" font-size="23" fill="#20344D" font-weight="400" text-anchor="start" >模拟模式或出现解析警告 → partial；没有可读文本 → failed</text>
+<text x="1618" y="4993" font-size="23" fill="#20344D" font-weight="400" text-anchor="start" >HTTP：400 参数／配置；403 未批准；404 不存在；409 未就绪；</text>
+<text x="1618" y="5036" font-size="23" fill="#20344D" font-weight="400" text-anchor="start" >          422 请求字段校验；502 外部搜索失败；响应体为 detail</text>
+<text x="1618" y="5079" font-size="23" fill="#20344D" font-weight="400" text-anchor="start" >JSON：临时文件 → replace；只有进程内锁，无多文件事务</text>
+<text x="1618" y="5122" font-size="23" fill="#20344D" font-weight="400" text-anchor="start" >仅单进程、本机单用户；没有认证、跨进程锁、自动重试或断点续跑</text>
+<text x="1618" y="5165" font-size="23" fill="#20344D" font-weight="400" text-anchor="start" >当前 PDF 物理页、DOCX 段落／表格行、TXT 行定位，无 bbox</text>
+<rect x="70" y="5310" width="3020" height="485" rx="22" fill="#182D47" stroke="none" stroke-width="1" />
+<text x="100" y="5360" font-size="32" fill="#FFFFFF" font-weight="650" text-anchor="start" >G  完整版本契约（规划，尚未实现）</text>
+<text x="100" y="5410" font-size="24" fill="#D6E4F2" font-weight="400" text-anchor="start" >进度与错误：SSE + Last-Event-ID；event_seq去重；request_id + 统一error；Idempotency-Key；资源revision与owner_id。</text>
+<text x="100" y="5455" font-size="24" fill="#D6E4F2" font-weight="400" text-anchor="start" >新增HTTP：解析版本、events、findings、retry/resume、evidence、artifacts、policy-versions发布、search-requests审批。</text>
+<text x="100" y="5500" font-size="24" fill="#D6E4F2" font-weight="400" text-anchor="start" >模型／工具：generate_structured；read_document_blocks；retrieve_rules/literature；recalculate_values；propose_search。</text>
+<text x="100" y="5545" font-size="24" fill="#D6E4F2" font-weight="400" text-anchor="start" >业务版本：Document不可变 → Job冻结材料／规范／提示词／配置 → Run记录每次执行；更改材料创建新Job。</text>
+<text x="100" y="5590" font-size="24" fill="#D6E4F2" font-weight="400" text-anchor="start" >证据与报告：Evidence独立ID + 位置 + 原文 + 来源哈希；Finding关联支持／反证；覆盖记录按章节×检查项保存。</text>
+<text x="100" y="5635" font-size="24" fill="#D6E4F2" font-weight="400" text-anchor="start" >解析定位：parse_id、章节树、单元格与裁图；bbox归一化；text_range为Unicode码点的左闭右开范围。</text>
+<text x="100" y="5680" font-size="24" fill="#D6E4F2" font-weight="400" text-anchor="start" >持久化：不可变产物 → 状态快照 → 原子Head提交 → 事件投影／可重建索引；恢复须校验输入与配置兼容性。</text>
+<text x="100" y="5725" font-size="24" fill="#D6E4F2" font-weight="400" text-anchor="start" >后续组件：Docling/OCR、向量检索、vLLM、数据库、隔离网关、认证与审计；LangGraph 四节点已接入。</text>
+<text x="70" y="5850" font-size="23" fill="#61748A" font-weight="400" text-anchor="start" >完整字段字典、请求示例、接口时序和目标职责见 README。图中上半部硬件均为共享预算，未做内网部署或 A100 实测。</text>
+<text x="3090" y="5890" font-size="21" fill="#61748A" font-weight="400" text-anchor="end" >文档版本 1.2 · LangGraph 最小接入 · 2026-11-08</text>
+</g>
+</svg>

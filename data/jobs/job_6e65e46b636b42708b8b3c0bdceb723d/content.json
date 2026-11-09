@@ -1,0 +1,48 @@
+{
+  "blocks": [
+    {
+      "id": "doc_4fc49da3d05e426a86e9e39de81a92fd:b1",
+      "document_id": "doc_4fc49da3d05e426a86e9e39de81a92fd",
+      "filename": "文本材料.txt",
+      "location": "文本行 1",
+      "text": "题目：面向文档的实验方法研究"
+    },
+    {
+      "id": "doc_4fc49da3d05e426a86e9e39de81a92fd:b2",
+      "document_id": "doc_4fc49da3d05e426a86e9e39de81a92fd",
+      "filename": "文本材料.txt",
+      "location": "文本行 2",
+      "text": "摘要：本研究比较两种方法在公开数据集上的效果。"
+    },
+    {
+      "id": "doc_4fc49da3d05e426a86e9e39de81a92fd:b3",
+      "document_id": "doc_4fc49da3d05e426a86e9e39de81a92fd",
+      "filename": "文本材料.txt",
+      "location": "文本行 3",
+      "text": "实验设置：TODO 补充训练集与测试集划分。"
+    },
+    {
+      "id": "doc_4fc49da3d05e426a86e9e39de81a92fd:b4",
+      "document_id": "doc_4fc49da3d05e426a86e9e39de81a92fd",
+      "filename": "文本材料.txt",
+      "location": "文本行 4",
+      "text": "结果：基线准确率为80%，本方法为84%。"
+    },
+    {
+      "id": "doc_4fc49da3d05e426a86e9e39de81a92fd:b5",
+      "document_id": "doc_4fc49da3d05e426a86e9e39de81a92fd",
+      "filename": "文本材料.txt",
+      "location": "文本行 5",
+      "text": "消融实验：待补充。"
+    },
+    {
+      "id": "doc_4fc49da3d05e426a86e9e39de81a92fd:b6",
+      "document_id": "doc_4fc49da3d05e426a86e9e39de81a92fd",
+      "filename": "文本材料.txt",
+      "location": "文本行 6",
+      "text": "结论：当前证据需要进一步完善。"
+    }
+  ],
+  "policies": [],
+  "warnings": []
+}
