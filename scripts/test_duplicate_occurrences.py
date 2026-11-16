@@ -1,0 +1,32 @@
+"""Regression controls for distinct source occurrences and physical evidence."""
+import sys,pickle
+from pathlib import Path
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
+from app.checkers.document_model import *
+from app.checkers.deterministic_checker import DeterministicChecker
+from app.evidence import attach_evidence
+phrase='这里是一段需要分别定位并且内容完全相同的测试句子'
+p=ParagraphData('p',phrase+'。'+phrase+'。',1,bbox=(50,100,500,160))
+lines=[TextLine(phrase+'。',(50,100,500,120),12,''),TextLine(phrase+'。',(50,140,500,160),12,'')]
+t=ThesisDocumentTree('test',all_body_paragraphs=[p],pages=[PageData(1,600,800,lines=lines,paragraphs=[p])])
+c=DeterministicChecker();fs,_=c._check_rule_2_duplicate_sentences(t);attach_evidence(t,fs)
+assert len(fs)==1 and fs[0].locations[0].bboxes!=fs[0].locations[1].bboxes
+assert fs[0].locations[0].bboxes==[[50.,100.,500.,120.]]
+assert fs[0].locations[1].bboxes==[[50.,140.,500.,160.]]
+t.all_body_paragraphs=[p,p];assert len(c._check_rule_2_duplicate_sentences(t)[0])==1
+p2=ParagraphData('other',p.text,1,bbox=p.bbox);t.all_body_paragraphs=[p,p2]
+# Duplicate overlapping text layers must not create additional finding pairs.
+fs,_=c._check_rule_2_duplicate_sentences(t)
+assert all(f.locations[0].block_id==f.locations[1].block_id for f in fs)
+t.all_body_paragraphs=[ParagraphData('f1',phrase,1,is_formula=True),ParagraphData('f2',phrase,2,is_formula=True)]
+assert not c._check_rule_2_duplicate_sentences(t)[0]
+for author in ['刘潇潇','韩葳','莫康华']:
+ path=Path('F:/auto-review/evidence-'+author+'.pkl')
+ if not path.exists():continue
+ tree=pickle.loads(path.read_bytes());fs,_=c._check_rule_2_duplicate_sentences(tree);attach_evidence(tree,fs)
+ assert fs and all(l.verified and l.bbox for f in fs for l in f.locations),(author,[(l.page,l.block_id,l.quote) for f in fs for l in f.locations if not l.bbox])
+ if author=='莫康华' and tree.pages[33].lines:
+  sample=next(f for f in fs if f.locations[0].page==34 and f.locations[1].page==34)
+  assert sample.locations[0].bboxes!=sample.locations[1].bboxes
+ print(author,'R2',len(fs),'all occurrences located')
+print('Duplicate occurrence controls passed')
