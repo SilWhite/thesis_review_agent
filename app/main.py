@@ -3,10 +3,11 @@
 from contextlib import asynccontextmanager
 from pathlib import Path
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from .config import Settings
-from .schemas import TextInput, ReviewRequest, SearchRequest
+from .schemas import TextInput, ReviewRequest, SearchRequest, ReviewDecisions
+from .final_report import build_final_report, report_digest, validate_exclusions
 from .storage import Store, now, new_id
 from .service import ReviewService
 from .search import search_public
@@ -105,6 +106,76 @@ def create_app(settings=None):
     @app.get("/api/v1/jobs/{identifier}/content")
     def content(identifier: str):
         return store.read(store.folder("jobs", identifier), "content.json")
+
+    @app.get('/api/v1/jobs/{identifier}/review-decisions')
+    def review_decisions(identifier: str):
+        with store.lock:
+            original = report(identifier)
+            digest = report_digest(original)
+            folder = store.folder('jobs', identifier)
+            saved = store.read(folder, 'review-decisions.json') if (folder/'review-decisions.json').exists() else {}
+            indices = saved.get('excluded_findings', []) if saved.get('source_report_sha256') == digest else []
+            revision = saved.get('revision', 0) if saved.get('source_report_sha256') == digest else 0
+            return dict(source_report_sha256=digest, excluded_findings=indices, revision=revision)
+
+    def save_decisions(identifier, body):
+        original = report(identifier)
+        if body.source_report_sha256 != report_digest(original):
+            raise HTTPException(409, '报告已更新，请刷新后重新复核。')
+        indices = validate_exclusions(original, body.excluded_findings)
+        current = review_decisions(identifier)
+        if body.revision != current['revision']:
+            raise HTTPException(409, '复核选择已在其他页面更新，请刷新页面后继续复核。')
+        saved = dict(source_report_sha256=body.source_report_sha256, excluded_findings=indices, revision=current['revision']+1)
+        store.write(store.folder('jobs', identifier), 'review-decisions.json', saved)
+        return original, saved
+
+    @app.post('/api/v1/jobs/{identifier}/review-decisions')
+    def update_review_decisions(identifier: str, body: ReviewDecisions):
+        with store.lock:
+            _, saved = save_decisions(identifier, body)
+            return saved
+
+    @app.post('/api/v1/jobs/{identifier}/final-report')
+    def final_report(identifier: str, body: ReviewDecisions):
+        from .review import markdown
+        with store.lock:
+            original, saved = save_decisions(identifier, body)
+            result = build_final_report(original, body.excluded_findings)
+            result['human_review']['decisions_revision'] = saved['revision']
+            snapshot = new_id('report')
+            folder = store.folder('jobs', identifier)/'final-reports'
+            store.write(folder, snapshot+'.json', result)
+            (folder/(snapshot+'.md')).write_text(markdown(result), encoding='utf-8')
+            return dict(report=result, revision=saved['revision'], download_url=f'/api/v1/jobs/{identifier}/final-reports/{snapshot}/download')
+
+    @app.get('/api/v1/jobs/{identifier}/final-reports/{snapshot}/download')
+    def download_final_report(identifier: str, snapshot: str):
+        report(identifier)
+        name = store.folder('reports', snapshot).name
+        if not name.startswith('report_'):
+            raise ValueError('无效的报告 ID。')
+        path = store.folder('jobs', identifier)/'final-reports'/(name+'.md')
+        if not path.is_file():
+            raise HTTPException(404, '最终报告不存在。')
+        return FileResponse(path, filename='final-review-report.md')
+
+    @app.get("/api/v1/jobs/{identifier}/evidence/{finding_index}/{location_index}")
+    def evidence_page(identifier: str, finding_index: int, location_index: int, full_page: bool = False):
+        result = report(identifier)
+        if finding_index < 0 or finding_index >= len(result.get('findings', [])):
+            raise HTTPException(404, '未找到这条问题。')
+        locations = result['findings'][finding_index].get('locations', [])
+        if location_index < 0 or location_index >= len(locations):
+            raise HTTPException(404, '未找到这处证据。')
+        request = store.read(store.folder('jobs', identifier), 'request.json')
+        folder = store.folder('documents', request['document_ids'][0])
+        meta = store.read(folder, 'document.json')
+        if meta['suffix'] != '.pdf':
+            raise HTTPException(404, '这份材料没有 PDF 原页。')
+        from .evidence import render_evidence_page
+        png = render_evidence_page(folder / ('source' + meta['suffix']), locations[location_index], full_page)
+        return Response(png, media_type='image/png', headers={'Cache-Control': 'private, max-age=300'})
 
     @app.get("/api/v1/jobs/{identifier}/download")
     def download(identifier: str):

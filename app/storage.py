@@ -17,6 +17,20 @@ def new_id(prefix):
     return f"{prefix}_{uuid4().hex}"
 
 
+def sanitize_unicode(val):
+    if isinstance(val, str):
+        try:
+            val = val.encode("utf-16", "surrogatepass").decode("utf-16", "replace")
+        except Exception:
+            pass
+        return val.encode("utf-8", "replace").decode("utf-8")
+    elif isinstance(val, dict):
+        return {k: sanitize_unicode(v) for k, v in val.items()}
+    elif isinstance(val, list):
+        return [sanitize_unicode(v) for v in val]
+    return val
+
+
 class Store:
     def __init__(self, root: Path):
         self.root = root
@@ -34,13 +48,19 @@ class Store:
             folder.mkdir(parents=True, exist_ok=True)
             target = folder / name
             temp = folder / (name + ".tmp")
-            temp.write_text(
-                json.dumps(value, ensure_ascii=False, indent=2), encoding="utf-8"
+            sanitized = sanitize_unicode(value)
+            content_str = json.dumps(sanitized, ensure_ascii=False, indent=2)
+            content_bytes = (
+                content_str.encode("utf-16", "surrogatepass")
+                .decode("utf-16", "replace")
+                .encode("utf-8", "replace")
             )
+            temp.write_bytes(content_bytes)
             temp.replace(target)
 
     def read(self, folder, name):
-        return json.loads((folder / name).read_text(encoding="utf-8"))
+        content = (folder / name).read_bytes().decode("utf-8", "replace")
+        return json.loads(content)
 
     def documents(self):
         return sorted(

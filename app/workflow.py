@@ -1,6 +1,7 @@
 """Four review stages; adapters and artifacts stay in their existing modules."""
 
 from collections.abc import Callable
+from pathlib import Path
 from typing import TypedDict
 
 from langgraph.graph import END, START, StateGraph
@@ -17,12 +18,19 @@ class ReviewState(TypedDict, total=False):
     blocks: list[dict]
     policies: list[dict]
     warnings: list[str]
+    source_path: str
     assessment: Assessment
     findings: list[Finding]
 
 
 class ReviewCancelled(Exception):
     """Stop between stages without marking a cancelled job as failed."""
+
+
+def _review_is_partial(warnings, model_mode, audit_items):
+    return bool(warnings or model_mode == "mock" or any(
+        item.status in ("缺少输入", "无法可靠判断", "执行失败") for item in audit_items
+    ))
 
 
 def build_workflow(store, settings, advance: Callable[[str, str], bool]):
@@ -48,7 +56,16 @@ def build_workflow(store, settings, advance: Callable[[str, str], bool]):
             raise ValueError(
                 "没有可评审文本。图片或扫描件需要先接入 OCR，或粘贴提取后的文本。"
             )
-        return content
+        source_path = None
+        if request.document_ids:
+            try:
+                first_doc_id = request.document_ids[0]
+                folder = store.folder("documents", first_doc_id)
+                meta = store.read(folder, "document.json")
+                source_path = str(folder / ("source" + meta["suffix"]))
+            except Exception:
+                pass
+        return dict(content, source_path=source_path)
 
     def review(state: ReviewState):
         enter(state, "reviewing")
@@ -56,8 +73,11 @@ def build_workflow(store, settings, advance: Callable[[str, str], bool]):
         reviewer = (
             MockReviewer() if request.model_mode == "mock" else LocalReviewer(settings)
         )
+        src = Path(state["source_path"]) if state.get("source_path") else None
         return {
-            "assessment": reviewer.assess(request, state["blocks"], state["policies"])
+            "assessment": reviewer.assess(
+                request, state["blocks"], state["policies"], source_path=src
+            )
         }
 
     def verify(state: ReviewState):
@@ -70,7 +90,7 @@ def build_workflow(store, settings, advance: Callable[[str, str], bool]):
         lookup = {b["id"]: b for b in state["blocks"]}
         limits = state["warnings"] + [
             "未接入原始实验数据与自动相关工作检索，不能认定造假或断言没有创新。",
-            "规范材料仅作为参考；本 demo 尚未实现规范发布与适用范围核定。",
+            "参考规范的适用范围需结合学校要求核对。",
         ]
         if not state["policies"]:
             limits.append(
@@ -92,8 +112,11 @@ def build_workflow(store, settings, advance: Callable[[str, str], bool]):
             findings=[
                 dict(
                     f.model_dump(),
-                    filename=lookup[f.block_id]["filename"],
-                    location=lookup[f.block_id]["location"],
+                    filename=lookup.get(f.block_id, {}).get("filename", (state["blocks"][0].get("filename") if state["blocks"] else "全文")),
+                    location=(
+                        lookup.get(f.block_id, {}).get("location")
+                        or (", ".join([f"第{loc.page}页" for loc in f.locations if loc.page is not None]) if f.locations else "全文/全局")
+                    ),
                 )
                 for f in state["findings"]
             ],
@@ -115,7 +138,7 @@ def build_workflow(store, settings, advance: Callable[[str, str], bool]):
                 identifier,
                 status=(
                     "partial"
-                    if state["warnings"] or request.model_mode == "mock"
+                    if _review_is_partial(state["warnings"], request.model_mode, state["assessment"].rule_matrix)
                     else "completed"
                 ),
             )
