@@ -10,10 +10,9 @@ export MODEL_BASE_URL="${MODEL_BASE_URL:-http://127.0.0.1:8122/v1}"
 export MODEL_NAME="${MODEL_NAME:-Qwen3.8-27B}"
 export MODEL_API_KEY="${MODEL_API_KEY:-none}"
 export DATA_ROOT="${DATA_ROOT:-$DIR/data}"
-export MAX_REVIEW_CHARS="${MAX_REVIEW_CHARS:-500000}"
 export MODEL_TIMEOUT="${MODEL_TIMEOUT:-600}"
 
-UVICORN_BIN="/home/amax/anaconda3/envs/qwen3/bin/uvicorn"
+UVICORN_BIN="${UVICORN_BIN:-uvicorn}"
 
 echo "=========================================="
 echo "Starting Thesis Review Agent Service"

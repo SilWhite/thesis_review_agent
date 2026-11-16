@@ -30,8 +30,10 @@ class CheckStatus(str, Enum):
 
 
 class ReviewDecisions(BaseModel):
-    source_report_sha256: str = Field(pattern=r'^[0-9a-f]{64}$')
-    excluded_findings: list[Annotated[int, Field(strict=True, ge=0)]] = Field(default_factory=list, max_length=100000)
+    source_report_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    excluded_findings: list[Annotated[int, Field(strict=True, ge=0)]] = Field(
+        default_factory=list, max_length=100000
+    )
     revision: int = Field(default=0, strict=True, ge=0)
 
 
@@ -50,7 +52,9 @@ class EvidenceLocation(BaseModel):
 
 class Finding(BaseModel):
     rule_id: int = Field(default=0, description="负面清单规则序号(2~38)")
-    rule_category: Literal["确定性检查", "版面排版", "语义核查", "通用规范"] = "通用规范"
+    rule_category: Literal["确定性检查", "版面排版", "语义核查", "通用规范"] = (
+        "通用规范"
+    )
     dimension: str = "规范与逻辑"
     severity: Literal["major", "minor"] = "minor"
     status: Literal["supported", "pending_verification"] = "supported"
@@ -83,4 +87,3 @@ class Assessment(BaseModel):
 class SearchRequest(BaseModel):
     query: str = Field(min_length=2, max_length=300)
     approved: bool = False
-

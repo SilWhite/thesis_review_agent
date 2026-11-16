@@ -1,0 +1,44 @@
+{
+  "cross_page.pdf": {
+    "tree": "a95b410ebedd4831b23a407b58c00270ffcbbef339e1d65f6c47850d04a1272b",
+    "assessment": "ba9d3d7125d560d2401e09d2132a3b9851094c92530e7f403bbcd57394fbbb0b",
+    "semantic": "70f7b380b07f612eb733571ecfbc0ffb6966e54dcb2dd736cb2625bce53500b5",
+    "prompts": "9967b123ceaf9b17f942312066375d76852e516e27fe713d30ae175623c61177",
+    "calls": 16
+  },
+  "ocr_concession.pdf": {
+    "tree": "d2f33825ea548996cdabb60fbe8c1493cf4dc864a75b5b408bac7f920697b3e2",
+    "assessment": "34f610b31b0f0dddc9ed3e9bb8dac1e6e6b4d2b12276c50bbd2e875084e94fc7",
+    "semantic": "58ae664c6e784c835b2431b61503580566202fb471d459f1e1939c366c49d022",
+    "prompts": "2634589acf4f04b95e71e95dca5184c1c30fc934c3a8de92532e97a5830ebac0",
+    "calls": 8
+  },
+  "layout.pdf": {
+    "tree": "e0ed3e015a516325b750426de978af3d120acb7ea140c439132dcd17ffaa313b",
+    "assessment": "6cdd753f2cd292845f3c80062c8172ab75dd3679e8edcc6523803c673cee2f41",
+    "semantic": "72a52af4d45c336accbde839b657502341dbbf5cff879fa7738e70d7daa8b5c1",
+    "prompts": "ef05da538b037ab6b0a743a0251e88d9bed285cbd3040e956be0223d2696994d",
+    "calls": 13
+  },
+  "sections.docx": {
+    "tree": "eeef20bb1ed78a941472963af269de3fb4cbd0c1a02e6ec9991dcf05cd283b3e",
+    "assessment": "7ef985059919f6d9ed4872e46e15e51b73dee1bd7c27ef9a5c931f565bb89df4",
+    "semantic": "fb55532da2344feae69459465b1c1aa017023c07762567f8decbfcabbdb68603",
+    "prompts": "a113ed62a92d29b482ee25ca1ddc1280f3ab49ac434c64ff6a81af941d3034d6",
+    "calls": 13
+  },
+  "numbered.docx": {
+    "tree": "0cf5fd5407b2fe7f30385c938eab0da204e4b1e9bf0cef6c2e51aeed2091c7a8",
+    "assessment": "90aaaeddccfe2635e6b287b267ece4e3a099b0881bf6e2d68b546f0704a072bd",
+    "semantic": "923c321e3fadcf4a281ef17ff120cd59bed5ad48f2bea1dcef01d084f59fc042",
+    "prompts": "b068f880532ba6b496e5873003f2ab2e8465f244c1361656e2be69370a2c8228",
+    "calls": 10
+  },
+  "blocks": {
+    "tree": "f9ff353c874dab596a4134985480d8ee0a93880d49001293d3faa1aff6ee563f",
+    "assessment": "314165cb63aec0752d3ecd20b8f6b1c3c5ae775dda46c3f60f9395cb113e6dab",
+    "semantic": "e9b4417748d6be26a0869c35e8d1a8347941f4080b0252f64676af7cdd7d2ab7",
+    "prompts": "1d59ba4711d311a49e26c2fcbc0e2954c04d5db95fb9e0f36e3188ca78db0c35",
+    "calls": 9
+  }
+}

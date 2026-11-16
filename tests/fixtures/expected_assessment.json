@@ -1,0 +1,507 @@
+{
+  "verdict": "需修改",
+  "summary": "本次针对毕业论文负面写作与格式规范清单（共37项）开展全自动深度核查。共检出 6 条问题提示（包含 2 条较严重提示、4 条一般提示），请结合证据核对。 另有 17 项未能可靠完成，请查看各项状态。",
+  "findings": [
+    {
+      "rule_id": 18,
+      "rule_category": "确定性检查",
+      "dimension": "规范与逻辑",
+      "severity": "major",
+      "status": "supported",
+      "block_id": "ref_1",
+      "quote": "[1] Zhang A. Complete reference[J]. Journal, 2020, 3(2): 1-8",
+      "locations": [
+        {
+          "page": 4,
+          "block_id": null,
+          "quote": "[1] Zhang A. Complete reference[J]. Journal, 2020, 3(2): 1-8.",
+          "bbox": null,
+          "bboxes": [],
+          "text_offset": null,
+          "description": "未被引用的文献条目",
+          "context": null,
+          "highlight_texts": [],
+          "verified": false
+        }
+      ],
+      "issue": "参考文献条目 [1] 在正文任何位置均未被引用。",
+      "suggestion": "学术论文文末参考文献必须与正文呼应，请在正文相关论述处引用 [1]，或从文末列表中删除该条目。",
+      "measurement": null,
+      "evidence_note": ""
+    },
+    {
+      "rule_id": 18,
+      "rule_category": "确定性检查",
+      "dimension": "规范与逻辑",
+      "severity": "major",
+      "status": "supported",
+      "block_id": "ref_2",
+      "quote": "[2] Li B. Missing year[J]. Journal: 2-4.",
+      "locations": [
+        {
+          "page": 5,
+          "block_id": null,
+          "quote": "[2] Li B. Missing year[J]. Journal: 2-4.",
+          "bbox": [
+            90.0,
+            103.7125015258789,
+            262.73553466796875,
+            118.1395034790039
+          ],
+          "bboxes": [],
+          "text_offset": null,
+          "description": "未被引用的文献条目",
+          "context": "[2] Li B. Missing year[J]. Journal: 2-4.",
+          "highlight_texts": [
+            "[2] Li B. Missing year[J]. Journal: 2-4."
+          ],
+          "verified": true
+        }
+      ],
+      "issue": "参考文献条目 [2] 在正文任何位置均未被引用。",
+      "suggestion": "学术论文文末参考文献必须与正文呼应，请在正文相关论述处引用 [2]，或从文末列表中删除该条目。",
+      "measurement": null,
+      "evidence_note": ""
+    },
+    {
+      "rule_id": 12,
+      "rule_category": "确定性检查",
+      "dimension": "规范与逻辑",
+      "severity": "minor",
+      "status": "supported",
+      "block_id": "f_p3",
+      "quote": "q = a + b",
+      "locations": [
+        {
+          "page": 3,
+          "block_id": null,
+          "quote": "q = a + b",
+          "bbox": [
+            200.0,
+            227.10000610351562,
+            247.3759765625,
+            243.58799743652344
+          ],
+          "bboxes": [],
+          "text_offset": null,
+          "description": "缺少编号的公式",
+          "context": "q = a + b",
+          "highlight_texts": [
+            "q = a + b"
+          ],
+          "verified": true
+        }
+      ],
+      "issue": "检测到该独立行数学公式右侧缺少标准公式编号（如 (3.1)）。",
+      "suggestion": "请按照学位论文撰写规范，为正文中具有核心推导意义的独立公式在右端添加按章连续编号。",
+      "measurement": null,
+      "evidence_note": ""
+    },
+    {
+      "rule_id": 13,
+      "rule_category": "语义核查",
+      "dimension": "规范与逻辑",
+      "severity": "minor",
+      "status": "pending_verification",
+      "block_id": "f_p3",
+      "quote": "w = m + n (1.2)",
+      "locations": [
+        {
+          "page": 3,
+          "block_id": null,
+          "quote": "w = m + n (1.2)",
+          "bbox": [
+            200.0,
+            337.1000061035156,
+            334.0759582519531,
+            353.5880126953125
+          ],
+          "bboxes": [],
+          "text_offset": null,
+          "description": "需核对符号定义的公式",
+          "context": "w = m + n (1.2)",
+          "highlight_texts": [
+            "w = m + n (1.2)"
+          ],
+          "verified": true
+        }
+      ],
+      "issue": "公式中的符号 m, n 附近未识别到明确说明，请核对上下文及前文定义。",
+      "suggestion": "请核对这些符号是否已在正文或符号表中清楚定义，并补充缺少的说明。",
+      "measurement": null,
+      "evidence_note": "重点核对问题中列出的符号；下方展示公式及原文说明。"
+    },
+    {
+      "rule_id": 19,
+      "rule_category": "确定性检查",
+      "dimension": "规范与逻辑",
+      "severity": "minor",
+      "status": "supported",
+      "block_id": "ref_2",
+      "quote": "[2] Li B. Missing year[J]. Journal: 2-4.",
+      "locations": [
+        {
+          "page": 5,
+          "block_id": null,
+          "quote": "[2] Li B. Missing year[J]. Journal: 2-4.",
+          "bbox": [
+            90.0,
+            103.7125015258789,
+            262.73553466796875,
+            118.1395034790039
+          ],
+          "bboxes": [],
+          "text_offset": null,
+          "description": "参考文献 [2] 的本页原文",
+          "context": "[2] Li B. Missing year[J]. Journal: 2-4.",
+          "highlight_texts": [
+            "[2] Li B. Missing year[J]. Journal: 2-4."
+          ],
+          "verified": true
+        }
+      ],
+      "issue": "参考文献条目 [2] 元数据信息不全：缺失出版年份。",
+      "suggestion": "请核对原出版记录，补齐缺少年份；页码或文章号须结合在线发表状态确认。",
+      "measurement": null,
+      "evidence_note": "已合并该条目在 PDF 第 5 页的文字后检查：缺失出版年份。"
+    },
+    {
+      "rule_id": 29,
+      "rule_category": "版面排版",
+      "dimension": "规范与逻辑",
+      "severity": "minor",
+      "status": "supported",
+      "block_id": "page_3",
+      "quote": "第 3 页",
+      "locations": [
+        {
+          "page": 3,
+          "block_id": null,
+          "quote": null,
+          "bbox": [
+            65.0,
+            353.5880126953125,
+            530.0,
+            722.0999755859375
+          ],
+          "bboxes": [],
+          "text_offset": null,
+          "description": "红框范围为连续留白区域",
+          "context": "留白前：w = m + n (1.2)\n留白后：x = y + z (1.1)",
+          "highlight_texts": [],
+          "verified": true
+        }
+      ],
+      "issue": "第 3 页非章节末尾，出现大片连续空白（占正文区域 53.3%）。",
+      "suggestion": "通常由前方图表强行分页引起。请调整图表插入锚点位置或开启文字环绕排版，消除不必要的页面断层大片空白。",
+      "measurement": "正文区域最大连续留白: 53.3%",
+      "evidence_note": "本页属于“第一章 研究方法”，该章正文位于 PDF 第 3–4 页。"
+    }
+  ],
+  "rule_matrix": [
+    {
+      "rule_id": 2,
+      "rule_name": "大论文内部重复句子（连续10个词完全相同）",
+      "category": "确定性检查",
+      "status": "无法可靠判断",
+      "findings_count": 0,
+      "note": "中文使用固定长度片段，未完整覆盖连续十个词及所有重复位置。"
+    },
+    {
+      "rule_id": 12,
+      "rule_name": "公式缺少编号",
+      "category": "确定性检查",
+      "status": "发现问题",
+      "findings_count": 1,
+      "note": null
+    },
+    {
+      "rule_id": 17,
+      "rule_name": "参考文献未排序",
+      "category": "确定性检查",
+      "status": "检查通过",
+      "findings_count": 0,
+      "note": null
+    },
+    {
+      "rule_id": 18,
+      "rule_name": "参考文献未被引用",
+      "category": "确定性检查",
+      "status": "发现问题",
+      "findings_count": 2,
+      "note": null
+    },
+    {
+      "rule_id": 19,
+      "rule_name": "参考文献信息不全",
+      "category": "确定性检查",
+      "status": "发现问题",
+      "findings_count": 1,
+      "note": null
+    },
+    {
+      "rule_id": 20,
+      "rule_name": "参考文献格式不统一",
+      "category": "确定性检查",
+      "status": "检查通过",
+      "findings_count": 0,
+      "note": null
+    },
+    {
+      "rule_id": 24,
+      "rule_name": "图表未在正文中提及和引用",
+      "category": "确定性检查",
+      "status": "检查通过",
+      "findings_count": 0,
+      "note": null
+    },
+    {
+      "rule_id": 35,
+      "rule_name": "标点符号滥用",
+      "category": "确定性检查",
+      "status": "检查通过",
+      "findings_count": 0,
+      "note": null
+    },
+    {
+      "rule_id": 36,
+      "rule_name": "大论文中出现'我们'",
+      "category": "确定性检查",
+      "status": "检查通过",
+      "findings_count": 0,
+      "note": null
+    },
+    {
+      "rule_id": 5,
+      "rule_name": "中文摘要第一段篇幅超过0.6页",
+      "category": "版面排版",
+      "status": "检查通过",
+      "findings_count": 0,
+      "note": null
+    },
+    {
+      "rule_id": 15,
+      "rule_name": "博士论文总结少于4页/硕士少于2页",
+      "category": "版面排版",
+      "status": "缺少输入",
+      "findings_count": 0,
+      "note": "未识别到总结与展望独立章节"
+    },
+    {
+      "rule_id": 22,
+      "rule_name": "图表中文字字体显著偏离正文字体",
+      "category": "版面排版",
+      "status": "无法可靠判断",
+      "findings_count": 0,
+      "note": "当前只检查部分表格字号，尚未识别图内文字字号。"
+    },
+    {
+      "rule_id": 23,
+      "rule_name": "缺少总图题直接分图标题",
+      "category": "版面排版",
+      "status": "检查通过",
+      "findings_count": 0,
+      "note": null
+    },
+    {
+      "rule_id": 25,
+      "rule_name": "图表分辨率不够导致内容模糊",
+      "category": "版面排版",
+      "status": "无法可靠判断",
+      "findings_count": 0,
+      "note": "当前只筛查部分位图分辨率，未完整判断图表是否清晰。"
+    },
+    {
+      "rule_id": 26,
+      "rule_name": "章节标题后无总述文字直接跟子标题",
+      "category": "版面排版",
+      "status": "检查通过",
+      "findings_count": 0,
+      "note": null
+    },
+    {
+      "rule_id": 27,
+      "rule_name": "章节标题后直接跟图或表",
+      "category": "版面排版",
+      "status": "无法可靠判断",
+      "findings_count": 0,
+      "note": "当前主要依据题注位置，可能漏掉题注前的图片。"
+    },
+    {
+      "rule_id": 28,
+      "rule_name": "章节标题在任何页的最后一行",
+      "category": "版面排版",
+      "status": "检查通过",
+      "findings_count": 0,
+      "note": null
+    },
+    {
+      "rule_id": 29,
+      "rule_name": "非章末留有大片空白",
+      "category": "版面排版",
+      "status": "发现问题",
+      "findings_count": 1,
+      "note": null
+    },
+    {
+      "rule_id": 30,
+      "rule_name": "任何段落超过0.6页长度",
+      "category": "版面排版",
+      "status": "检查通过",
+      "findings_count": 0,
+      "note": null
+    },
+    {
+      "rule_id": 31,
+      "rule_name": "全文超过10个段落少于1行",
+      "category": "版面排版",
+      "status": "检查通过",
+      "findings_count": 0,
+      "note": null
+    },
+    {
+      "rule_id": 32,
+      "rule_name": "单字或单标点符号占1行",
+      "category": "版面排版",
+      "status": "检查通过",
+      "findings_count": 0,
+      "note": null
+    },
+    {
+      "rule_id": 33,
+      "rule_name": "单行占用整页",
+      "category": "版面排版",
+      "status": "检查通过",
+      "findings_count": 0,
+      "note": null
+    },
+    {
+      "rule_id": 34,
+      "rule_name": "正文字体字号不一致",
+      "category": "版面排版",
+      "status": "检查通过",
+      "findings_count": 0,
+      "note": null
+    },
+    {
+      "rule_id": 3,
+      "rule_name": "中英文标题不对应",
+      "category": "语义核查",
+      "status": "执行失败",
+      "findings_count": 0,
+      "note": "模拟模式未执行模型审查"
+    },
+    {
+      "rule_id": 4,
+      "rule_name": "中英文摘要内容不对应",
+      "category": "语义核查",
+      "status": "执行失败",
+      "findings_count": 0,
+      "note": "模拟模式未执行模型审查"
+    },
+    {
+      "rule_id": 6,
+      "rule_name": "摘要缺少总结段",
+      "category": "语义核查",
+      "status": "检查通过",
+      "findings_count": 0,
+      "note": null
+    },
+    {
+      "rule_id": 7,
+      "rule_name": "现状分析仅文献罗列",
+      "category": "语义核查",
+      "status": "无法可靠判断",
+      "findings_count": 0,
+      "note": "仅按少量文献综述用词筛查，尚未完整判断分类与优缺点。"
+    },
+    {
+      "rule_id": 8,
+      "rule_name": "未在现状后总结关键问题",
+      "category": "语义核查",
+      "status": "执行失败",
+      "findings_count": 0,
+      "note": "模型逐段阅读：0/97 字；失败 1 处；待核对 0 处。检查范围：完整第一章及全文章标题。未完成：第3页起“第一章 研究方法”"
+    },
+    {
+      "rule_id": 9,
+      "rule_name": "未阐明各章有机联系",
+      "category": "语义核查",
+      "status": "执行失败",
+      "findings_count": 0,
+      "note": "模型逐段阅读：0/97 字；失败 1 处；待核对 0 处。检查范围：完整第一章及全文章标题。未完成：第3页起“第一章 研究方法”"
+    },
+    {
+      "rule_id": 10,
+      "rule_name": "各章缺少本章拟解决关键问题",
+      "category": "语义核查",
+      "status": "执行失败",
+      "findings_count": 0,
+      "note": "模拟模式未执行模型审查"
+    },
+    {
+      "rule_id": 11,
+      "rule_name": "各章缺少方法动机描述",
+      "category": "语义核查",
+      "status": "执行失败",
+      "findings_count": 0,
+      "note": "模拟模式未执行模型审查"
+    },
+    {
+      "rule_id": 37,
+      "rule_name": "章节标题与内容不符",
+      "category": "语义核查",
+      "status": "执行失败",
+      "findings_count": 0,
+      "note": "模型逐段阅读：0/50 字；失败 3 处；待核对 0 处。正文共 3 段、3 个阅读片段；包含各章正文，排除识别出的图表文字、刻度、公式和脚注。待复查位置：第3页“本章介绍一种论文审查方法。”返回无效；第3页“其中 a 表示权重,b 表示偏差。”返回无效；第4页“式中,y 表示输入数值,z 表示偏移”返回无效"
+    },
+    {
+      "rule_id": 13,
+      "rule_name": "公式中的符号没有给出定义或说明",
+      "category": "语义核查",
+      "status": "发现问题",
+      "findings_count": 1,
+      "note": null
+    },
+    {
+      "rule_id": 16,
+      "rule_name": "总结与摘要内容雷同",
+      "category": "语义核查",
+      "status": "缺少输入",
+      "findings_count": 0,
+      "note": "缺少摘要或总结章节"
+    },
+    {
+      "rule_id": 14,
+      "rule_name": "各章小结与摘要雷同",
+      "category": "语义核查",
+      "status": "缺少输入",
+      "findings_count": 0,
+      "note": "缺少摘要或未识别到章节小结正文"
+    },
+    {
+      "rule_id": 21,
+      "rule_name": "图表中非专业术语用英文表达",
+      "category": "语义核查",
+      "status": "无法可靠判断",
+      "findings_count": 0,
+      "note": "当前只筛查图表标题中的部分英文，未覆盖图片和表格内部文字。"
+    },
+    {
+      "rule_id": 38,
+      "rule_name": "逻辑连词用法错误",
+      "category": "语义核查",
+      "status": "执行失败",
+      "findings_count": 0,
+      "note": "模型逐段阅读：0/50 字；失败 3 处；待核对 0 处。正文共 3 段、3 个阅读片段；包含各章正文，排除识别出的图表文字、刻度、公式和脚注。待复查位置：第3页“本章介绍一种论文审查方法。”返回无效；第3页“其中 a 表示权重,b 表示偏差。”返回无效；第4页“式中,y 表示输入数值,z 表示偏移”返回无效"
+    }
+  ],
+  "priority_actions": [
+    "【规则 18】参考文献条目 [1] 在正文任何位置均未被引用。 -> 学术论文文末参考文献必须与正文呼应，请在正文相关论述处引用 [1]，或从文末列表中删除该条目。",
+    "【规则 18】参考文献条目 [2] 在正文任何位置均未被引用。 -> 学术论文文末参考文献必须与正文呼应，请在正文相关论述处引用 [2]，或从文末列表中删除该条目。",
+    "【规则 12】检测到该独立行数学公式右侧缺少标准公式编号（如 (3.1)）。 -> 请按照学位论文撰写规范，为正文中具有核心推导意义的独立公式在右端添加按章连续编号。",
+    "【规则 13】公式中的符号 m, n 附近未识别到明确说明，请核对上下文及前文定义。 -> 请核对这些符号是否已在正文或符号表中清楚定义，并补充缺少的说明。",
+    "【规则 19】参考文献条目 [2] 元数据信息不全：缺失出版年份。 -> 请核对原出版记录，补齐缺少年份；页码或文章号须结合在线发表状态确认。",
+    "请人工复核未能可靠完成的 17 项检查。"
+  ]
+}

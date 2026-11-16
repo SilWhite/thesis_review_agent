@@ -6,8 +6,10 @@ from typing import TypedDict
 
 from langgraph.graph import END, START, StateGraph
 
-from .parsing import parse_document
-from .review import LocalReviewer, MockReviewer, markdown, validate_evidence
+from .documents.parser import parse_document
+from .review.engine import LocalReviewer, MockReviewer
+from .reporting.markdown import markdown
+from .evidence.validation import validate_evidence
 from .schemas import Assessment, Finding, ReviewRequest
 from .storage import now
 
@@ -28,9 +30,14 @@ class ReviewCancelled(Exception):
 
 
 def _review_is_partial(warnings, model_mode, audit_items):
-    return bool(warnings or model_mode == "mock" or any(
-        item.status in ("缺少输入", "无法可靠判断", "执行失败") for item in audit_items
-    ))
+    return bool(
+        warnings
+        or model_mode == "mock"
+        or any(
+            item.status in ("缺少输入", "无法可靠判断", "执行失败")
+            for item in audit_items
+        )
+    )
 
 
 def build_workflow(store, settings, advance: Callable[[str, str], bool]):
@@ -112,10 +119,27 @@ def build_workflow(store, settings, advance: Callable[[str, str], bool]):
             findings=[
                 dict(
                     f.model_dump(),
-                    filename=lookup.get(f.block_id, {}).get("filename", (state["blocks"][0].get("filename") if state["blocks"] else "全文")),
+                    filename=lookup.get(f.block_id, {}).get(
+                        "filename",
+                        (
+                            state["blocks"][0].get("filename")
+                            if state["blocks"]
+                            else "全文"
+                        ),
+                    ),
                     location=(
                         lookup.get(f.block_id, {}).get("location")
-                        or (", ".join([f"第{loc.page}页" for loc in f.locations if loc.page is not None]) if f.locations else "全文/全局")
+                        or (
+                            ", ".join(
+                                [
+                                    f"第{loc.page}页"
+                                    for loc in f.locations
+                                    if loc.page is not None
+                                ]
+                            )
+                            if f.locations
+                            else "全文/全局"
+                        )
                     ),
                 )
                 for f in state["findings"]
@@ -138,7 +162,11 @@ def build_workflow(store, settings, advance: Callable[[str, str], bool]):
                 identifier,
                 status=(
                     "partial"
-                    if _review_is_partial(state["warnings"], request.model_mode, state["assessment"].rule_matrix)
+                    if _review_is_partial(
+                        state["warnings"],
+                        request.model_mode,
+                        state["assessment"].rule_matrix,
+                    )
                     else "completed"
                 ),
             )
