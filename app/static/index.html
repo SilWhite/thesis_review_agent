@@ -1,18 +1,16 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Thesis Review · 论文评审工作台</title><link rel="stylesheet" href="/static/style.css"></head>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Thesis Review · 论文评审工作台</title><link rel="stylesheet" href="/static/style.css?v=20261113_2"></head>
 <body>
-<aside><a class="brand" href="/">TR<span>THESIS REVIEW</span></a><div class="nav active">◈　评审工作台</div><a class="nav" href="/docs" target="_blank">↗　接口文档</a><div class="side-note">LOCAL WORKSPACE<br><b>论文留在本机</b><p>上传、解析与报告存储均在本地。公开检索需要单独授权。</p><span class="dot"></span> 本地文件存储</div></aside>
-<main><header><div><div class="eyebrow">RESEARCH QUALITY / DEMO 0.1</div><h1>论文评审工作台</h1><p>从材料到依据，让每条意见都能回到原文。</p></div><span class="badge">本地演示版</span></header>
-<div class="notice">当前支持文本、PDF 与 DOCX 的文本提取。图片可保存，尚未配置 OCR。模拟报告仅用于验证流程。</div>
+<aside><a class="brand" href="/">TR<span>THESIS REVIEW</span></a><div class="nav active">◈　评审工作台</div></aside>
+<main><header><h1>论文评审工作台</h1></header>
 <div class="workspace"><section class="panel input-panel"><div class="section-heading"><span class="number">01</span><h2>准备评审材料</h2></div>
 <form id="review-form"><label class="upload">＋ 添加论文文件<input id="files" type="file" multiple accept=".pdf,.docx,.txt,.png,.jpg,.jpeg"><small>PDF / DOCX / TXT / 图片 · 每个文件 ≤ 30MB</small></label><div id="upload-status" class="muted" aria-live="polite"></div>
-<label>或粘贴论文文本<textarea id="text" rows="6" placeholder="粘贴摘要、实验或完整材料……"></textarea></label><button type="button" class="text-button" id="example">填入测试材料</button>
+<label>额外评审重点（可选）<textarea id="prompt" rows="6" maxlength="10000" placeholder="例如：重点核查实验设计、数据划分与结论依据。"></textarea></label>
 <div class="form-grid"><label>材料类型<select id="material"><option value="thesis">毕业／学位论文</option><option value="proposal">开题报告</option><option value="progress">中期报告</option><option value="paper">小论文</option></select></label><label>学位层次<select id="degree"><option value="master">硕士</option><option value="bachelor">本科</option><option value="doctor">博士</option><option value="unknown">未说明</option></select></label></div>
-<div class="form-grid"><label>评审引擎<select id="mode"><option value="mock">模拟引擎 · 流程验证</option><option value="local" disabled>内网模型 · 尚未配置</option></select></label><label>输出语言<select id="language"><option value="zh-CN">中文</option><option value="en">English</option></select></label></div>
+<div class="form-grid"><label>评审引擎<select id="mode"><option value="local">模型评审</option></select></label><label>输出语言<select id="language"><option value="zh-CN">中文</option><option value="en">English</option></select></label></div>
 <label>参考规范（可选）<input id="policies" type="file" multiple accept=".pdf,.docx,.txt"></label><div id="saved-policies"></div>
-<label>额外评审重点（可选）<textarea id="prompt" rows="2" placeholder="例如：重点核查实验数据划分与提升幅度。"></textarea></label>
-<button class="primary" id="submit" type="submit">开始评审 <span>→</span></button></form></section>
+<button class="primary" id="submit" type="submit" disabled>开始评审 <span>→</span></button></form></section>
 <div class="results-column"><section class="panel"><div class="section-heading"><span class="number">02</span><h2>评审任务</h2><button class="text-button" id="refresh">刷新</button></div><div id="jobs" class="job-list"><p class="muted">还没有任务。从左侧添加一份材料开始。</p></div></section>
-<section class="panel report-panel"><div class="section-heading"><span class="number">03</span><h2>评审报告</h2><a id="download" class="text-button" hidden>下载 Markdown ↗</a></div><div id="report"><div class="empty"><div class="empty-icon">≡</div><h3>等待一份有依据的评审</h3><p>完成后，这里将展示总体判断、关键问题与优先事项。</p><div class="dimensions"><span>结果可信度</span><span>内容可靠性</span><span>规范与逻辑</span><span>创新与价值</span></div></div></div></section>
+<section class="panel report-panel"><div class="section-heading"><span class="number">03</span><h2>评审报告</h2><a id="download" class="text-button" hidden>下载原始报告 ↗</a></div><div id="report"><div class="empty"><div class="empty-icon">≡</div><h3>暂无评审报告</h3></div></div></section>
 <details class="panel search-panel"><summary>公开文献查证 <span class="muted">独立于论文评审</span></summary><p class="muted">仅查询 Crossref 书目信息，不自动发送论文内容；检索结果不自动写入评审报告。</p><input id="query" placeholder="输入已公开的题名或 DOI" maxlength="300"><label class="check"><input type="checkbox" id="approved">我确认该查询可公开，并批准发送到 Crossref。</label><button type="button" id="search" class="secondary">检索公开文献</button><div id="search-results"></div></details>
-</div></div><footer>Thesis Review Agent · 可追溯的评审流程，独立的模型与存储接口。</footer></main><div id="toast" role="alert" hidden></div><script src="/static/app.js"></script></body></html>
+</div></div></main><div id="toast" role="alert" hidden></div><script src="/static/evidence.js?v=20261112_1"></script><script src="/static/app.js?v=20261113_3"></script></body></html>

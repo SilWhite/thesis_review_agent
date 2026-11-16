@@ -424,11 +424,25 @@ button:disabled {
 }
 
 .finding {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr);
+    gap: 12px;
     border: 1px solid #e0e7e1;
     border-radius: 8px;
     padding: 14px;
     margin: 12px 0
 }
+
+.finding-toggle { display: flex; flex-direction: column; align-items: center; gap: 5px; margin: 0; cursor: pointer; }
+.finding-toggle input { width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--accent); cursor: pointer; }
+.finding-content { min-width: 0; overflow-wrap: anywhere; }
+.finding.excluded { background: #f6f7f6; border-style: dashed; }
+.finding.excluded .finding-content { opacity: .55; }
+.finding.excluded .finding-issue, .finding.excluded .finding-suggestion { text-decoration: line-through; }
+.final-report-actions { border-top: 1px solid var(--line); margin-top: 24px; padding-top: 12px; }
+.download-final { display: inline-block; margin: 10px 0; }
+.final-preview { margin-top: 12px; }
+.final-finding { display: block; }
 
 .finding blockquote {
     margin: 12px 0;

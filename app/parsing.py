@@ -4,6 +4,16 @@ from docx import Document
 from pypdf import PdfReader
 
 
+def sanitize_unicode(text: str) -> str:
+    if not isinstance(text, str):
+        return text
+    try:
+        text = text.encode("utf-16", "surrogatepass").decode("utf-16", "replace")
+    except Exception:
+        pass
+    return text.encode("utf-8", "replace").decode("utf-8")
+
+
 def parse_document(store, identifier):
     folder = store.folder("documents", identifier)
     meta = store.read(folder, "document.json")
@@ -11,6 +21,7 @@ def parse_document(store, identifier):
     blocks, warnings = [], []
 
     def append(text, location):
+        text = sanitize_unicode(text)
         if text.strip():
             blocks.append(
                 dict(
@@ -45,7 +56,7 @@ def parse_document(store, identifier):
         )
     elif meta["suffix"] == ".txt":
         for number, paragraph in enumerate(
-            source.read_text(encoding="utf-8").splitlines(), 1
+            source.read_text(encoding="utf-8", errors="replace").splitlines(), 1
         ):
             append(paragraph, f"文本行 {number}")
     else:

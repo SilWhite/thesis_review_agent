@@ -13,4 +13,6 @@ class Settings:
     model_url: str = os.getenv("MODEL_BASE_URL", "")
     model_name: str = os.getenv("MODEL_NAME", "")
     model_key: str = os.getenv("MODEL_API_KEY", "")
-    max_upload: int = 30 * 1024 * 1024
+    max_upload: int = int(os.getenv("MAX_UPLOAD_BYTES", str(100 * 1024 * 1024)))
+    max_chars: int = int(os.getenv("MAX_REVIEW_CHARS", "500000"))
+    model_timeout: int = int(os.getenv("MODEL_TIMEOUT", "600"))
