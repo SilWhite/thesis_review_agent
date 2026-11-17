@@ -5,12 +5,16 @@ from urllib.parse import urlencode
 from urllib.request import urlopen
 
 
-def search_public(query):
+def search_items(query):
     url = "https://api.crossref.org/works?" + urlencode(
         {"query.bibliographic": query, "rows": 5}
     )
     with urlopen(url, timeout=20) as response:
-        items = json.load(response)["message"]["items"]
+        return json.load(response)["message"]["items"]
+
+
+def search_public(query):
+    items = search_items(query)
     return [
         dict(
             title=item.get("title", ["无标题"])[0],

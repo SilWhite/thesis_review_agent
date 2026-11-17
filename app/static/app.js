@@ -24,7 +24,9 @@ const stages = {
     parsing: '文档解析',
     reviewing: '生成意见',
     verifying: '校验证据',
-    reporting: '报告已生成'
+    reporting: '报告已生成',
+    experiments: '实验材料核对',
+    novelty: '创新性初判'
 };
 async function api(path, options = {}) {
     const response = await fetch('/api/v1' + path, options);
@@ -45,54 +47,6 @@ function notify(message) {
     $('#toast').hidden = false;
     setTimeout(() => $('#toast').hidden = true, 6000);
 }
-async function upload(files, role) {
-    const ids = [];
-    for (const file of files) {
-        $('#upload-status').textContent = '正在保存 ' + file.name;
-        const form = new FormData();
-        form.append('file', file);
-        form.append('role', role);
-        ids.push((await api('/documents', {
-            method: 'POST',
-            body: form
-        })).id);
-    }
-    $('#upload-status').textContent = '';
-    return ids;
-}
-async function loadPolicies() {
-    const docs = await api('/documents');
-    $('#saved-policies').innerHTML = docs.filter(d => d.role === 'policy').map(d => `<label class="check"><input type="checkbox" value="${d.id}">${esc(d.filename)} <small>已保存</small></label>`).join('');
-}
-$('#review-form').onsubmit = async event => {
-    event.preventDefault();
-    $('#submit').disabled = true;
-    try {
-        if (!modelAvailable) throw new Error('评审模型暂不可用，请稍后重试。');
-        if (!$('#files').files.length) throw new Error('请上传论文文件。');
-        const ids = await upload($('#files').files, 'primary');
-        const policies = [...document.querySelectorAll('#saved-policies input:checked')].map(e => e.value);
-        policies.push(...await upload($('#policies').files, 'policy'));
-        const job = await post('/jobs', {
-            document_ids: ids,
-            policy_ids: policies,
-            material_type: $('#material').value,
-            degree: $('#degree').value,
-            language: $('#language').value,
-            custom_prompt: $('#prompt').value,
-            model_mode: 'local'
-        });
-        selected = job.id;
-        lastRendered = null;
-        await refresh();
-        await loadPolicies();
-    } catch (error) {
-        notify(error.message);
-    } finally {
-        $('#submit').disabled = !modelAvailable;
-    }
-};
-
 async function showReport(job) {
     const key = job.id + job.updated_at;
     if (lastRendered === key) return;
@@ -106,12 +60,12 @@ async function showReport(job) {
                 api(`/jobs/${job.id}/review-decisions`)
             ]);
         } catch (e) {
-            if (selected !== job.id) return;
+            if (selected !== job.id || currentTab !== 'review') return;
             activeReview = null;
             $('#report').innerHTML = `<p class="error">加载报告失败: ${esc(e.message)}</p>`;
             return;
         }
-        if (selected !== job.id || lastRendered === key) return;
+        if (selected !== job.id || currentTab !== 'review' || lastRendered === key) return;
         let state = reviewStates.get(job.id);
         if (!state || state.digest !== decisions.source_report_sha256) {
             state = {jobId:job.id, digest:decisions.source_report_sha256, excluded:new Set(decisions.excluded_findings),
@@ -213,49 +167,3 @@ async function showReport(job) {
     }
     lastRendered = key;
 }
-async function refresh() {
-    const jobs = await api('/jobs');
-    if (!selected && jobs.length) selected = jobs[0].id;
-    $('#jobs').innerHTML = jobs.length ? jobs.map(j => `<div class="job ${j.id===selected?'selected':''}"><button data-job="${j.id}"><strong>${esc(j.title)}</strong><small>${new Date(j.created_at).toLocaleString()}</small></button><span class="status ${j.status}">${statuses[j.status]}</span>${['queued','running'].includes(j.status)?`<button class="text-button" data-cancel="${j.id}">取消</button>`:''}</div>`).join('') : '<p class="muted">还没有任务。从左侧添加一份材料开始。</p>';
-    document.querySelectorAll('[data-job]').forEach(b => b.onclick = () => {
-        selected = b.dataset.job;
-        refresh().catch(e => notify(e.message));
-    });
-    document.querySelectorAll('[data-cancel]').forEach(b => b.onclick = async () => {
-        try {
-            await post(`/jobs/${b.dataset.cancel}/cancel`, {});
-            await refresh();
-        } catch (e) {
-            notify(e.message);
-        }
-    });
-    const job = jobs.find(j => j.id === selected);
-    if (job) await showReport(job);
-}
-$('#refresh').onclick = () => refresh().catch(e => notify(e.message));
-$('#search').onclick = async () => {
-    $('#search').disabled = true;
-    try {
-        const record = await post('/search', {
-            query: $('#query').value,
-            approved: $('#approved').checked
-        });
-        $('#search-results').innerHTML = record.results.map(r => `<article><b>${esc(r.title)}</b><br><a href="https://doi.org/${encodeURIComponent(r.doi||'')}" target="_blank" rel="noopener noreferrer">${esc(r.doi||'无 DOI')}</a> · 仅书目信息</article>`).join('') || '<p>未检索到结果；不表示文献不存在。</p>';
-    } catch (e) {
-        notify(e.message);
-    } finally {
-        $('#search').disabled = false;
-    }
-};
-async function init() {
-    const config = await api('/config');
-    modelAvailable = Boolean(config.local_model_available);
-    $('#mode option[value=local]').textContent = modelAvailable ? '模型评审' : '模型暂不可用';
-    $('#submit').disabled = !modelAvailable;
-    await loadPolicies();
-    await refresh();
-}
-init().catch(e => notify(e.message));
-setInterval(() => refresh().catch(error => {
-    $('#upload-status').textContent = '服务连接异常：' + error.message;
-}), 1500);

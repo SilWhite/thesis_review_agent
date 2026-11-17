@@ -26,10 +26,15 @@ class CompatibilityTest(unittest.TestCase):
     def test_openapi_contract(self):
         with tempfile.TemporaryDirectory() as directory:
             app = create_app(Settings(data_dir=Path(directory)))
-            self.assertEqual(
-                app.openapi(),
-                json.loads((FIXTURES / "expected_openapi.json").read_text()),
-            )
+            expected = json.loads((FIXTURES / "expected_openapi.json").read_text())
+            actual = app.openapi()
+            # Additive audit endpoints must not change any existing operation/schema.
+            actual["paths"] = {key: actual["paths"][key] for key in expected["paths"]}
+            actual["components"]["schemas"] = {
+                key: actual["components"]["schemas"][key]
+                for key in expected["components"]["schemas"]
+            }
+            self.assertEqual(actual, expected)
             app.state.service.worker.shutdown()
 
     def test_assessment_contract(self):

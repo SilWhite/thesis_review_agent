@@ -1,12 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="4100" viewBox="0 0 1800 4100" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="7780" viewBox="0 0 1800 7780" role="img" aria-labelledby="title desc">
 <title id="title">学位论文自动审查系统当前架构与后续边界</title>
-<desc id="desc">2026年11月16日目录整理版。当前37项审查、LangGraph四节点、证据、人工复核、接口、本地字段、资源估算及两种待建设的联网模式。</desc>
+<desc id="desc">统一工作台、37项审查及创新性与实验材料首版：模块职责、图内流程、接口、协议、存储、资源及未实现边界。</desc>
 <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#2779a7"/></marker></defs>
 <g font-family="PingFang SC, Microsoft YaHei, Arial, sans-serif">
-<rect x="0" y="0" width="1800" height="4100" rx="0" fill="#f3f6f9" stroke="#f3f6f9"/>
+<rect x="0" y="0" width="1800" height="7780" rx="0" fill="#f3f6f9" stroke="#f3f6f9"/>
 <rect x="35" y="30" width="1730" height="120" rx="14" fill="#17364a" stroke="#17364a"/>
 <text x="60" y="79" font-size="36" fill="#fff" font-weight="600">学位论文自动审查系统  当前代码架构</text>
-<text x="60" y="121" font-size="21" fill="#dae6ee" font-weight="400">当前实现 · 2026-11-16  37项检查、证据定位与人工复核  |  待建设能力已标注  |  资源为规划估算</text>
+<text x="60" y="121" font-size="21" fill="#dae6ee" font-weight="400">当前实现 · 2026-11-16  统一工作台 + 37项／创新性／实验材料  |  待建设能力已标注  |  资源为规划估算</text>
 <text x="45" y="190" font-size="23" fill="#243447" font-weight="600">运行主线：任务串行；部分正文批次最多并发2个模型请求；应用入口 app.main:create_app</text>
 <rect x="40" y="215" width="265" height="100" rx="14" fill="#fff" stroke="#d7e0e8"/>
 <text x="52" y="252" font-size="23" fill="#243447" font-weight="600">01 上传网页</text>
@@ -35,8 +35,8 @@
 <rect x="40" y="380" width="850" height="160" rx="14" fill="#fff" stroke="#d7e0e8"/>
 <text x="60" y="415" font-size="25" fill="#243447" font-weight="600">01 材料入口  static/</text>
 <text x="752" y="414" font-size="18" fill="#16756d" font-weight="400">已实现</text>
-<text x="60" y="450" font-size="20" fill="#243447" font-weight="400">上传 → 参数／重点 → 提交 → 原文／截图 → 划除</text>
-<text x="60" y="479" font-size="20" fill="#243447" font-weight="400">app.js + evidence.js + review.js；轮询1.5秒</text>
+<text x="60" y="450" font-size="20" fill="#243447" font-weight="400">一次材料 → 三类开关 → 原接口提交 → 页签／历史</text>
+<text x="60" y="479" font-size="20" fill="#243447" font-weight="400">workspace.js调度；app/audit/review/evidence各司其职</text>
 <text x="60" y="508" font-size="20" fill="#243447" font-weight="400">普通浏览器；无GPU；调用02与08接口</text>
 <rect x="915" y="380" width="850" height="160" rx="14" fill="#fff" stroke="#d7e0e8"/>
 <text x="935" y="415" font-size="25" fill="#243447" font-weight="600">02 接口与任务  api/ + jobs.py</text>
@@ -84,7 +84,7 @@
 <text x="60" y="1135" font-size="25" fill="#243447" font-weight="600">09 公开查询  search.py</text>
 <text x="752" y="1134" font-size="18" fill="#16756d" font-weight="400">部分实现</text>
 <text x="60" y="1170" font-size="20" fill="#243447" font-weight="400">手填query → approved=true → Crossref → 元数据</text>
-<text x="60" y="1199" font-size="20" fill="#243447" font-weight="400">独立于论文工作流；无自动查证或结果入报告</text>
+<text x="60" y="1199" font-size="20" fill="#243447" font-weight="400">原/search保持独立；补充图复用取书目／摘要</text>
 <text x="60" y="1228" font-size="20" fill="#243447" font-weight="400">当前共用应用；目标网关2–4 vCPU / 4–8GB RAM</text>
 <rect x="915" y="1100" width="850" height="160" rx="14" fill="#fff" stroke="#d7e0e8"/>
 <text x="935" y="1135" font-size="25" fill="#243447" font-weight="600">10 安全与运维</text>
@@ -217,14 +217,200 @@
 <rect x="40" y="3550" width="1725" height="430" rx="14" fill="#fff" stroke="#d7e0e8"/>
 <text x="62" y="3588" font-size="25" fill="#243447" font-weight="600">已实现边界、后续内容与验证</text>
 <text x="62" y="3628" font-size="20" fill="#243447" font-weight="400">当前重点：37项写作／格式／部分语义审查；不是完整四维学术质量核验，也不是查重或造假认定系统。</text>
-<text x="62" y="3659" font-size="20" fill="#243447" font-weight="400">尚未完整实施：实验日志与数据真实性、比较公平性、文献／事实真实性、最接近工作和创新评价。</text>
+<text x="62" y="3659" font-size="20" fill="#243447" font-weight="400">补充首版已实现：批准查询创新性初判、材料关联与差异；不证明数据真实性或完成全面查新。</text>
 <text x="62" y="3690" font-size="20" fill="#243447" font-weight="400">保留限制：无OCR；阶段／语言字段没有完整分支；规范虽提取但未用于动态规则或模型上下文；多材料证据待完善。</text>
 <text x="62" y="3721" font-size="20" fill="#243447" font-weight="400">规则2/7/13/14/16/21/22/25/27等有覆盖局限；引文可定位不等于解释正确；硬编码阈值需确认适用范围。</text>
 <text x="62" y="3752" font-size="20" fill="#243447" font-weight="400">后续优先：确认规则与四维范围 → 真实模型／专家样本 → 参数与规范接入、阈值口径、长文和多材料 → OCR与查证。</text>
 <text x="62" y="3783" font-size="20" fill="#243447" font-weight="400">按需扩展：认证／保留／删除／备份；数据库、多实例、向量库、SSE、检查点与自主工具循环均未实施。</text>
-<text x="62" y="3814" font-size="20" fill="#243447" font-weight="400">当前回归25/25套件通过：23 Python + 2 Node；检查接口、审查结果、文档树、语义状态及提示词契约。</text>
+<text x="62" y="3814" font-size="20" fill="#243447" font-weight="400">当前回归30/30套件通过：26 Python + 4 Node；检查接口、审查结果、文档树、语义状态及提示词契约。</text>
 <text x="62" y="3845" font-size="20" fill="#243447" font-weight="400">这些是工程回归，不证明真实模型准确率、真实论文召回、A100性能或内网出站隔离；前端为VM契约，非视觉验收。</text>
 <text x="62" y="3876" font-size="20" fill="#243447" font-weight="400">代码导航：解析看documents/；规则看review/checks/；连接看model_client.py；复核看reporting/；状态看jobs.py。</text>
 <text x="62" y="3907" font-size="20" fill="#243447" font-weight="400">解析按格式分工，语义按五组任务分工；双解析统一、复杂状态机及启发式改进需独立验证。</text>
-<text x="45" y="4050" font-size="22" fill="#526678" font-weight="400">依据：当前源码与回归结果  |  完整接口、字段及待确认事项见 README、需求文档和技术方案</text>
+<text x="45" y="4050" font-size="22" fill="#526678" font-weight="400">下方：可选补充审查模块、详细调用、接口和本地字段；原有主流程及37项检查保持不变</text>
+<rect x="35" y="4100" width="1730" height="75" rx="14" fill="#17364a" stroke="#d7e0e8"/>
+<text x="60" y="4148" font-size="30" fill="#fff" font-weight="600">补充首版 · 联网创新性初判与实验材料交叉核对（可选）</text>
+<rect x="40" y="4200" width="320" height="100" rx="14" fill="#fff" stroke="#d7e0e8"/>
+<text x="52" y="4239" font-size="22" fill="#243447" font-weight="600">统一入口 /</text>
+<text x="52" y="4273" font-size="17" fill="#243447" font-weight="400">论文＋实验关联＋批准查询</text>
+<path d="M362,4250 L384,4250" stroke="#2779a7" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="390" y="4200" width="320" height="100" rx="14" fill="#fff" stroke="#d7e0e8"/>
+<text x="402" y="4239" font-size="22" fill="#243447" font-weight="600">共享单worker</text>
+<text x="402" y="4273" font-size="17" fill="#243447" font-weight="400">AuditService.submit</text>
+<path d="M712,4250 L734,4250" stroke="#2779a7" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="740" y="4200" width="320" height="100" rx="14" fill="#fff" stroke="#d7e0e8"/>
+<text x="752" y="4239" font-size="22" fill="#243447" font-weight="600">独立LangGraph</text>
+<text x="752" y="4273" font-size="17" fill="#243447" font-weight="400">parse → experiments → novelty</text>
+<path d="M1062,4250 L1084,4250" stroke="#2779a7" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="1090" y="4200" width="320" height="100" rx="14" fill="#fff" stroke="#d7e0e8"/>
+<text x="1102" y="4239" font-size="22" fill="#243447" font-weight="600">证据准入与报告</text>
+<text x="1102" y="4273" font-size="17" fill="#243447" font-weight="400">report → JSON / Markdown</text>
+<path d="M1412,4250 L1434,4250" stroke="#2779a7" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="1440" y="4200" width="320" height="100" rx="14" fill="#fff" stroke="#d7e0e8"/>
+<text x="1452" y="4239" font-size="22" fill="#243447" font-weight="600">复用本地存储</text>
+<text x="1452" y="4273" font-size="17" fill="#243447" font-weight="400">audits/、audit-materials/</text>
+<rect x="40" y="4340" width="850" height="270" rx="14" fill="#fff" stroke="#d7e0e8"/>
+<text x="62" y="4378" font-size="25" fill="#243447" font-weight="600">11A 材料输入与静态事实 · audit/materials.py</text>
+<text x="62" y="4418" font-size="20" fill="#243447" font-weight="400">upload → UTF-8原件 + SHA256 + role/split/id_column</text>
+<text x="62" y="4448" font-size="20" fill="#243447" font-weight="400">read_material → Source / Facts / Notes / 样本ID集合</text>
+<text x="62" y="4478" font-size="20" fill="#243447" font-weight="400">JSON与safe YAML → 键路径；Python AST → 字面量赋值</text>
+<text x="62" y="4508" font-size="20" fill="#243447" font-weight="400">CSV/JSON数组/JSONL → 记录数；CSV结果 → 有限指标列</text>
+<text x="62" y="4538" font-size="20" fill="#243447" font-weight="400">数据集须指定划分和完整ID列；不执行作者代码</text>
+<text x="62" y="4568" font-size="20" fill="#243447" font-weight="400">CPU与RAM复用应用主机；单份≤10MiB；无新增GPU需求</text>
+<rect x="915" y="4340" width="850" height="270" rx="14" fill="#fff" stroke="#d7e0e8"/>
+<text x="937" y="4378" font-size="25" fill="#243447" font-weight="600">11B 实验一致性 · audit/consistency.py</text>
+<text x="937" y="4418" font-size="20" fill="#243447" font-weight="400">用户论文片段精确匹配 → 同一实验的指定文件</text>
+<text x="937" y="4448" font-size="20" fill="#243447" font-weight="400">paper_facts + 文件Facts → compare 数值与ID重叠</text>
+<text x="937" y="4478" font-size="20" fill="#243447" font-weight="400">epochs / batch_size / learning_rate / split_count / 指标</text>
+<text x="937" y="4508" font-size="20" fill="#243447" font-weight="400">accuracy / macro_f1允许显式百分数换算与显示舍入</text>
+<text x="937" y="4538" font-size="20" fill="#243447" font-weight="400">本地模型理解代码与指标 → 双侧逐字引文 → 待核实</text>
+<text x="937" y="4568" font-size="20" fill="#243447" font-weight="400">配置覆盖、数据分片、版本或ID含义不明不认定矛盾</text>
+<rect x="40" y="4640" width="850" height="270" rx="14" fill="#fff" stroke="#d7e0e8"/>
+<text x="62" y="4678" font-size="25" fill="#243447" font-weight="600">12 创新性初判 · audit/novelty.py</text>
+<text x="62" y="4718" font-size="20" fill="#243447" font-weight="400">手填≤3条精确query → search_approved → retrieve</text>
+<text x="62" y="4748" font-size="20" fill="#243447" font-weight="400">复用search_items → Crossref HTTPS GET /works，20秒</text>
+<text x="62" y="4778" font-size="20" fill="#243447" font-weight="400">每查询≤5条 → DOI去重、日期筛选 → 书目/摘要登记</text>
+<text x="62" y="4808" font-size="20" fill="#243447" font-weight="400">本地模型选≤5项 → 论文引文 + 来源引文 + 差异解释</text>
+<text x="62" y="4838" font-size="20" fill="#243447" font-weight="400">无摘要仅候选；初步支持 / 差异不清 / 信息不足</text>
+<text x="62" y="4868" font-size="20" fill="#243447" font-weight="400">联网仅发query；论文、数据、代码留在本地模型</text>
+<rect x="915" y="4640" width="850" height="270" rx="14" fill="#fff" stroke="#d7e0e8"/>
+<text x="937" y="4678" font-size="25" fill="#243447" font-weight="600">13 编排与发布 · audit/service.py + reporting.py</text>
+<text x="937" y="4718" font-size="20" fill="#243447" font-weight="400">submit → request/state → 复用ReviewService.worker</text>
+<text x="937" y="4748" font-size="20" fill="#243447" font-weight="400">parse → experiments → novelty → report，云追踪关闭</text>
+<text x="937" y="4778" font-size="20" fill="#243447" font-weight="400">每阶段/每实验检查取消，发布前锁内检查取消</text>
+<text x="937" y="4808" font-size="20" fill="#243447" font-weight="400">模型或检索失败明确记录，不使用生成数据填补</text>
+<text x="937" y="4838" font-size="20" fill="#243447" font-weight="400">独立报告含sources/facts/findings/notes及novelty</text>
+<text x="937" y="4868" font-size="20" fill="#243447" font-weight="400">普通浏览器＋共享CPU/SSD；模型仍使用内部A100</text>
+<path d="M460,4612 L460,4634" stroke="#2779a7" stroke-width="3" marker-end="url(#arrow)"/>
+<path d="M1340,4612 L1340,4634" stroke="#2779a7" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="40" y="4940" width="850" height="410" rx="14" fill="#fff" stroke="#d7e0e8"/>
+<text x="62" y="4978" font-size="25" fill="#243447" font-weight="600">新增HTTP接口 · 统一前缀 /api/v1</text>
+<text x="62" y="5018" font-size="20" fill="#243447" font-weight="400">POST /audit-materials → 201 Material（multipart）</text>
+<text x="62" y="5048" font-size="20" fill="#243447" font-weight="400">file, role, split=unknown, id_column=&quot;&quot;；最大10MiB</text>
+<text x="62" y="5078" font-size="20" fill="#243447" font-weight="400">GET /audit-materials/{id}/content → 原文件</text>
+<text x="62" y="5108" font-size="20" fill="#243447" font-weight="400">POST /audits → 202 queued状态（JSON AuditRequest）</text>
+<text x="62" y="5138" font-size="20" fill="#243447" font-weight="400">GET /audits/{id} → 状态；POST /{id}/cancel → 取消</text>
+<text x="62" y="5168" font-size="20" fill="#243447" font-weight="400">GET /audits/{id}/report → JSON；/{id}/download → MD</text>
+<text x="62" y="5198" font-size="20" fill="#243447" font-weight="400">GET / 与 /audit → 同一工作台；启动方式不变</text>
+<text x="62" y="5228" font-size="20" fill="#243447" font-weight="400">未批准403；未配置400；未发布409；参数422</text>
+<text x="62" y="5258" font-size="20" fill="#243447" font-weight="400">后台异常记录failed/error；不输出假结果或假位置</text>
+<text x="62" y="5288" font-size="20" fill="#243447" font-weight="400">GET /workspace/tasks → 全历史分组；无需手填ID</text>
+<rect x="915" y="4940" width="850" height="410" rx="14" fill="#fff" stroke="#d7e0e8"/>
+<text x="937" y="4978" font-size="25" fill="#243447" font-weight="600">请求与模块协议 · 普通Python调用／HTTP</text>
+<text x="937" y="5018" font-size="20" fill="#243447" font-weight="400">AuditRequest：document_id；experiments≤10</text>
+<text x="937" y="5048" font-size="20" fill="#243447" font-weight="400">Experiment：id/name/paper_quote/material_ids≤20</text>
+<text x="937" y="5078" font-size="20" fill="#243447" font-weight="400">public_queries≤3；search_approved；可选cutoff日期</text>
+<text x="937" y="5108" font-size="20" fill="#243447" font-weight="400">degree=master等；model_mode=local/mock</text>
+<text x="937" y="5138" font-size="20" fill="#243447" font-weight="400">read_material(store,id) → source,facts,notes,ids</text>
+<text x="937" y="5168" font-size="20" fill="#243447" font-weight="400">compare(facts,datasets) → findings,notes</text>
+<text x="937" y="5198" font-size="20" fill="#243447" font-weight="400">semantic_review(client,mode,sources) → findings,notes</text>
+<text x="937" y="5228" font-size="20" fill="#243447" font-weight="400">retrieve(queries,cutoff) → sources,searches</text>
+<text x="937" y="5258" font-size="20" fill="#243447" font-weight="400">assess(client,mode,paper,sources,degree) → novelty</text>
+<text x="937" y="5288" font-size="20" fill="#243447" font-weight="400">ModelClient：原JSON协议，补充前缀，max_tokens=4000</text>
+<rect x="40" y="5380" width="850" height="340" rx="14" fill="#fff" stroke="#d7e0e8"/>
+<text x="62" y="5418" font-size="25" fill="#243447" font-weight="600">本地字段与文件 · 不保存额外中间产物</text>
+<text x="62" y="5458" font-size="20" fill="#243447" font-weight="400">audit-materials/{mat_id}/material.json + source.ext</text>
+<text x="62" y="5488" font-size="20" fill="#243447" font-weight="400">Material：filename/suffix/role/split/id_column/hash/size</text>
+<text x="62" y="5518" font-size="20" fill="#243447" font-weight="400">audits/{audit_id}/request.json + state.json</text>
+<text x="62" y="5548" font-size="20" fill="#243447" font-weight="400">report.json + report.md；traces/0001.json ...</text>
+<text x="62" y="5578" font-size="20" fill="#243447" font-weight="400">Report：document/mode/experiments/novelty/limitations</text>
+<text x="62" y="5608" font-size="20" fill="#243447" font-weight="400">Experiment：id/name/status/sources/facts/findings/notes</text>
+<text x="62" y="5638" font-size="20" fill="#243447" font-weight="400">Fact：id/field/value/source_id/location/origin/method</text>
+<text x="62" y="5668" font-size="20" fill="#243447" font-weight="400">Finding：check/status/evidence/issue/suggestion</text>
+<rect x="915" y="5380" width="850" height="340" rx="14" fill="#fff" stroke="#d7e0e8"/>
+<text x="937" y="5418" font-size="25" fill="#243447" font-weight="600">来源、状态与判断边界</text>
+<text x="937" y="5458" font-size="20" fill="#243447" font-weight="400">Literature：id/title/doi/url/published/abstract/scope</text>
+<text x="937" y="5488" font-size="20" fill="#243447" font-weight="400">Search：query/approved/retrieved_at/count</text>
+<text x="937" y="5518" font-size="20" fill="#243447" font-weight="400">Comparison：source_id/paper_quote/source_quote/判断/差异</text>
+<text x="937" y="5548" font-size="20" fill="#243447" font-weight="400">status沿用queued/running/partial/completed等终态</text>
+<text x="937" y="5578" font-size="20" fill="#243447" font-weight="400">stage：parsing/experiments/novelty/reporting</text>
+<text x="937" y="5608" font-size="20" fill="#243447" font-weight="400">mock、警告、Notes或创新性不足 → partial</text>
+<text x="937" y="5638" font-size="20" fill="#243447" font-weight="400">重启标记interrupted；无续跑、复核划除或报告快照</text>
+<text x="937" y="5668" font-size="20" fill="#243447" font-weight="400">来源匹配不是真实性证明；未发现不代表不存在问题</text>
+<rect x="40" y="5750" width="1725" height="330" rx="14" fill="#fff" stroke="#d7e0e8"/>
+<text x="62" y="5788" font-size="25" fill="#243447" font-weight="600">证据准入、阅读范围与待完成内容</text>
+<text x="62" y="5828" font-size="20" fill="#243447" font-weight="400">数值由实际文件提取或计算；差异保持待核实。模型须返回有效source_id和双侧逐字quote，非法候选拒绝并记Notes。</text>
+<text x="62" y="5858" font-size="20" fill="#243447" font-weight="400">创新性仅用登记来源，文献标题和链接由后端渲染；无摘要不作肯定判断；不运行全文查新或论文复现。</text>
+<text x="62" y="5888" font-size="20" fill="#243447" font-weight="400">实验模型每来源≤12000字符、合计≤30000；创新性论文前24000字符、摘要每篇≤2000；截断明示，不宣称全文已审。</text>
+<text x="62" y="5918" font-size="20" fill="#243447" font-weight="400">代码仅静态阅读；不读压缩包/Notebook/二进制权重/原始图像音频；方法、指标语义判断与材料对应关系须专家复核。</text>
+<text x="62" y="5948" font-size="20" fill="#243447" font-weight="400">生成/模拟/增强数据和绘图常量可能合理；无法排除一致编造，不凭随机函数、异常统计或文风认定虚构。</text>
+<text x="62" y="5978" font-size="20" fill="#243447" font-weight="400">30套回归含统一工作台、配置与舍入、数据与ID、来源拒绝、批准查询、传输替身、trace、取消与重启；真实模型效果未验收。</text>
+<text x="62" y="6008" font-size="20" fill="#243447" font-weight="400">后续：复杂配置覆盖、表格/指标、多语言与长文、更多文献与全文、人工复核；正式出站网关/权限/保留策略待建设。</text>
+<text x="62" y="6038" font-size="20" fill="#243447" font-weight="400">硬件：新增静态处理共用CPU/RAM/SSD，本地模型共用A100；没有新增训练执行器、数据库或向量服务。</text>
+<text x="45" y="6150" font-size="22" fill="#243447" font-weight="400">下方：统一工作台内部流程、只读历史汇总与原接口复用；后端审查链路不变</text>
+<rect x="35" y="6200" width="1730" height="75" rx="14" fill="#17364a" stroke="#d7e0e8"/>
+<text x="60" y="6248" font-size="30" fill="#fff" font-weight="600">14 统一工作台 · 一次材料、三类可选审查、全部历史与报告</text>
+<rect x="40" y="6300" width="320" height="100" rx="14" fill="#fff" stroke="#d7e0e8"/>
+<text x="52" y="6339" font-size="22" fill="#243447" font-weight="600">选择已有或上传一次</text>
+<text x="52" y="6373" font-size="17" fill="#243447" font-weight="400">File＋role缓存 → 同一doc_id</text>
+<path d="M362,6350 L384,6350" stroke="#2779a7" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="390" y="6300" width="320" height="100" rx="14" fill="#fff" stroke="#d7e0e8"/>
+<text x="402" y="6339" font-size="22" fill="#243447" font-weight="600">勾选审查项目</text>
+<text x="402" y="6373" font-size="17" fill="#243447" font-weight="400">规范 / 创新性 / 实验材料</text>
+<path d="M712,6350 L734,6350" stroke="#2779a7" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="740" y="6300" width="320" height="100" rx="14" fill="#fff" stroke="#d7e0e8"/>
+<text x="752" y="6339" font-size="22" fill="#243447" font-weight="600">复用原提交接口</text>
+<text x="752" y="6373" font-size="17" fill="#243447" font-weight="400">POST /jobs 与 POST /audits</text>
+<path d="M1062,6350 L1084,6350" stroke="#2779a7" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="1090" y="6300" width="320" height="100" rx="14" fill="#fff" stroke="#d7e0e8"/>
+<text x="1102" y="6339" font-size="22" fill="#243447" font-weight="600">读取全部历史</text>
+<text x="1102" y="6373" font-size="17" fill="#243447" font-weight="400">GET /workspace/tasks</text>
+<path d="M1412,6350 L1434,6350" stroke="#2779a7" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="1440" y="6300" width="320" height="100" rx="14" fill="#fff" stroke="#d7e0e8"/>
+<text x="1452" y="6339" font-size="22" fill="#243447" font-weight="600">页签＋历史版本</text>
+<text x="1452" y="6373" font-size="17" fill="#243447" font-weight="400">查看证据 / 复核 / 下载</text>
+<rect x="40" y="6440" width="850" height="290" rx="14" fill="#fff" stroke="#d7e0e8"/>
+<text x="62" y="6478" font-size="25" fill="#243447" font-weight="600">14A 前端职责与硬件 · static/</text>
+<text x="62" y="6518" font-size="20" fill="#243447" font-weight="400">index.html：唯一业务页面；/ 与 /audit 返回相同内容</text>
+<text x="62" y="6548" font-size="20" fill="#243447" font-weight="400">workspace.js：输入选择、上传缓存、提交、任务与页签</text>
+<text x="62" y="6578" font-size="20" fill="#243447" font-weight="400">app.js：共享API/转义/提示、原37项报告渲染</text>
+<text x="62" y="6608" font-size="20" fill="#243447" font-weight="400">audit.js：配套材料输入、创新性与实验报告渲染</text>
+<text x="62" y="6638" font-size="20" fill="#243447" font-weight="400">review.js：原人工划除与最终报告；evidence.js：证据</text>
+<text x="62" y="6668" font-size="20" fill="#243447" font-weight="400">轮询1.5秒；动态文本转义；切换后忽略过时报告响应</text>
+<text x="62" y="6698" font-size="20" fill="#243447" font-weight="400">普通浏览器；后端共享原CPU/RAM/SSD/A100</text>
+<rect x="915" y="6440" width="850" height="290" rx="14" fill="#fff" stroke="#d7e0e8"/>
+<text x="937" y="6478" font-size="25" fill="#243447" font-weight="600">14B 只读汇总 · api/workspace.py</text>
+<text x="937" y="6518" font-size="20" fill="#243447" font-weight="400">GET /api/v1/workspace/tasks，无请求体 → Group[]</text>
+<text x="937" y="6548" font-size="20" fill="#243447" font-weight="400">Store锁内读 jobs 和 audits 的 state.json/request.json</text>
+<text x="937" y="6578" font-size="20" fill="#243447" font-weight="400">读首份document.json → 按document_id归集任务</text>
+<text x="937" y="6608" font-size="20" fill="#243447" font-weight="400">Group：document_id/title/tasks；按最新创建时间排序</text>
+<text x="937" y="6638" font-size="20" fill="#243447" font-weight="400">Task：原state + kind/checks/document_ids</text>
+<text x="937" y="6668" font-size="20" fill="#243447" font-weight="400">每组内所有状态/版本按created_at倒序，不写原件</text>
+<text x="937" y="6698" font-size="20" fill="#243447" font-weight="400">无新父任务、数据库、工作台目录或浏览器本地索引</text>
+<rect x="40" y="6760" width="850" height="350" rx="14" fill="#fff" stroke="#d7e0e8"/>
+<text x="62" y="6798" font-size="25" fill="#243447" font-weight="600">14C 材料复用与选择性提交协议</text>
+<text x="62" y="6838" font-size="20" fill="#243447" font-weight="400">新原件：POST /documents multipart → 201 Document</text>
+<text x="62" y="6868" font-size="20" fill="#243447" font-weight="400">已有原件：GET /documents → 选择相同doc_id</text>
+<text x="62" y="6898" font-size="20" fill="#243447" font-weight="400">check-review → POST /jobs，保留原ReviewRequest</text>
+<text x="62" y="6928" font-size="20" fill="#243447" font-weight="400">check-novelty或experiments → POST /audits</text>
+<text x="62" y="6958" font-size="20" fill="#243447" font-weight="400">document_id与规范document_ids[0]引用同一原件</text>
+<text x="62" y="6988" font-size="20" fill="#243447" font-weight="400">两个补充项同选只创建一个AuditRequest及后台任务</text>
+<text x="62" y="7018" font-size="20" fill="#243447" font-weight="400">未勾选项不提交；查询须明确批准，改词重置批准</text>
+<text x="62" y="7048" font-size="20" fill="#243447" font-weight="400">File+role缓存避免当前页面重复上传；刷新后选已有</text>
+<text x="62" y="7078" font-size="20" fill="#243447" font-weight="400">只读历史接口不改变原/jobs列表或任务／报告字段</text>
+<rect x="915" y="6760" width="850" height="350" rx="14" fill="#fff" stroke="#d7e0e8"/>
+<text x="937" y="6798" font-size="25" fill="#243447" font-weight="600">14D 任务、历史与报告选择</text>
+<text x="937" y="6838" font-size="20" fill="#243447" font-weight="400">每份论文卡片列出所有规范和补充任务及实际状态</text>
+<text x="937" y="6868" font-size="20" fill="#243447" font-weight="400">点击任务 → 对应页签；每页签可独立选择历史版本</text>
+<text x="937" y="6898" font-size="20" fill="#243447" font-weight="400">默认该类别最新任务；显示任务ID、时间与失败原因</text>
+<text x="937" y="6928" font-size="20" fill="#243447" font-weight="400">不同页签可能来自不同执行，不合成总体通过结论</text>
+<text x="937" y="6958" font-size="20" fill="#243447" font-weight="400">原多论文任务只归第一份论文，保留原材料数量</text>
+<text x="937" y="6988" font-size="20" fill="#243447" font-weight="400">规范：原report/content/review-decisions/final-report</text>
+<text x="937" y="7018" font-size="20" fill="#243447" font-weight="400">补充：原/audits/{id}/report，按类别展示同一JSON</text>
+<text x="937" y="7048" font-size="20" fill="#243447" font-weight="400">下载保留原Markdown；补充下载包含两类完整内容</text>
+<text x="937" y="7078" font-size="20" fill="#243447" font-weight="400">刷新后从已有文件重建列表，无需记住任务ID</text>
+<rect x="40" y="7140" width="1725" height="480" rx="14" fill="#fff" stroke="#d7e0e8"/>
+<text x="62" y="7178" font-size="25" fill="#243447" font-weight="600">端到端调用、失败与当前限制</text>
+<text x="62" y="7218" font-size="20" fill="#243447" font-weight="400">浏览器验证勾选项与精确查询批准 → 保存原件（一次） → 得到doc_id → 依次调用已选的原提交接口。</text>
+<text x="62" y="7248" font-size="20" fill="#243447" font-weight="400">规范：POST /jobs {document_ids:[doc_id], policy_ids, material_type, degree, language, custom_prompt, model_mode}。</text>
+<text x="62" y="7278" font-size="20" fill="#243447" font-weight="400">补充：POST /audits {document_id:doc_id, experiments, public_queries, search_approved, literature_cutoff, degree, model_mode}。</text>
+<text x="62" y="7308" font-size="20" fill="#243447" font-weight="400">轮询 GET /workspace/tasks → Group[] → 选择论文及报告版本 → GET 原报告接口 → 在同页渲染证据／限制。</text>
+<text x="62" y="7338" font-size="20" fill="#243447" font-weight="400">取消仍POST /jobs/{id}/cancel或/audits/{id}/cancel；一个补充任务的两项共同取消，不影响规范任务。</text>
+<text x="62" y="7368" font-size="20" fill="#243447" font-weight="400">部分提交失败：明确已接受的类别，保留已排队任务，不回滚、自动重复提交或生成替代结果。</text>
+<text x="62" y="7398" font-size="20" fill="#243447" font-weight="400">最新任务失败就显示失败，不自动用旧成功结果替代；模型/检索失败仍按原链路标注不足与partial/failed。</text>
+<text x="62" y="7428" font-size="20" fill="#243447" font-weight="400">原复核选择按job保存；切换页签后保存继续，返回原任务可继续划除和生成最终报告。</text>
+<text x="62" y="7458" font-size="20" fill="#243447" font-weight="400">范围：仅规范可多论文；带补充项每次一篇，页面一次一个实验；仍无补充人工划除或统一最终报告。</text>
+<text x="62" y="7488" font-size="20" fill="#243447" font-weight="400">无列表分页/筛选、跨任务事务、全局文件哈希去重；无新增父任务状态、后台编排或独立页面。</text>
+<text x="62" y="7518" font-size="20" fill="#243447" font-weight="400">30套回归 + 浏览器构造响应验证上传一次、三类报告、旧复核、历史恢复及移动布局；不替代模型效果验收。</text>
+<text x="62" y="7548" font-size="20" fill="#243447" font-weight="400">硬件预算与审查能力不因统一界面扩大；正式身份权限、出站网关及数据保留策略仍需建设。</text>
+<text x="45" y="7715" font-size="22" fill="#243447" font-weight="400">依据：当前源码、离线回归与浏览器构造响应  |  启动方式及业务接口不变；详见 README 与技术方案</text>
 </g></svg>

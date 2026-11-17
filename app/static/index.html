@@ -1,16 +1,60 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Thesis Review · 论文评审工作台</title><link rel="stylesheet" href="/static/style.css?v=20261113_2"></head>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>论文审查工作台</title><link rel="stylesheet" href="/static/style.css?v=20261116"></head>
 <body>
-<aside><a class="brand" href="/">TR<span>THESIS REVIEW</span></a><div class="nav active">◈　评审工作台</div></aside>
-<main><header><h1>论文评审工作台</h1></header>
-<div class="workspace"><section class="panel input-panel"><div class="section-heading"><span class="number">01</span><h2>准备评审材料</h2></div>
-<form id="review-form"><label class="upload">＋ 添加论文文件<input id="files" type="file" multiple accept=".pdf,.docx,.txt,.png,.jpg,.jpeg"><small>PDF / DOCX / TXT / 图片 · 每个文件 ≤ 30MB</small></label><div id="upload-status" class="muted" aria-live="polite"></div>
+<aside><a class="brand" href="/">TR<span>THESIS REVIEW</span></a><div class="nav active">◈　审查工作台</div></aside>
+<main><header><h1>论文审查工作台</h1></header>
+<div class="workspace"><section class="panel input-panel">
+<div class="section-heading"><span class="number">01</span><h2>准备材料与选择审查</h2></div>
+<form id="review-form">
+<label>复用已上传论文<select id="paper-existing"><option value="">选择已有论文，或上传新文件</option></select></label>
+<label class="upload">＋ 添加论文文件<input id="files" type="file" multiple accept=".pdf,.docx,.txt,.png,.jpg,.jpeg"><small>多个审查共用同一份原件，无需重复上传</small></label>
+<div id="upload-status" class="muted" aria-live="polite"></div>
+<fieldset class="check-options"><legend>审查内容</legend>
+<label class="check"><input id="check-review" type="checkbox" checked>规范与逻辑（37 项）</label>
+<label class="check"><input id="check-novelty" type="checkbox">联网创新性初判</label>
+<label class="check"><input id="check-experiments" type="checkbox">实验材料一致性</label>
+</fieldset>
+<div class="form-grid"><label>学位层次<select id="degree"><option value="master">硕士</option><option value="bachelor">本科</option><option value="doctor">博士</option><option value="unknown">未说明</option></select></label>
+<label>评审引擎<select id="mode"><option value="local">模型评审</option></select></label></div>
+<div id="review-options">
 <label>额外评审重点（可选）<textarea id="prompt" rows="6" maxlength="10000" placeholder="例如：重点核查实验设计、数据划分与结论依据。"></textarea></label>
-<div class="form-grid"><label>材料类型<select id="material"><option value="thesis">毕业／学位论文</option><option value="proposal">开题报告</option><option value="progress">中期报告</option><option value="paper">小论文</option></select></label><label>学位层次<select id="degree"><option value="master">硕士</option><option value="bachelor">本科</option><option value="doctor">博士</option><option value="unknown">未说明</option></select></label></div>
-<div class="form-grid"><label>评审引擎<select id="mode"><option value="local">模型评审</option></select></label><label>输出语言<select id="language"><option value="zh-CN">中文</option><option value="en">English</option></select></label></div>
+<div class="form-grid"><label>材料类型<select id="material"><option value="thesis">毕业／学位论文</option><option value="proposal">开题报告</option><option value="progress">中期报告</option><option value="paper">小论文</option></select></label>
+<label>输出语言<select id="language"><option value="zh-CN">中文</option><option value="en">English</option></select></label></div>
 <label>参考规范（可选）<input id="policies" type="file" multiple accept=".pdf,.docx,.txt"></label><div id="saved-policies"></div>
-<button class="primary" id="submit" type="submit" disabled>开始评审 <span>→</span></button></form></section>
-<div class="results-column"><section class="panel"><div class="section-heading"><span class="number">02</span><h2>评审任务</h2><button class="text-button" id="refresh">刷新</button></div><div id="jobs" class="job-list"><p class="muted">还没有任务。从左侧添加一份材料开始。</p></div></section>
-<section class="panel report-panel"><div class="section-heading"><span class="number">03</span><h2>评审报告</h2><a id="download" class="text-button" hidden>下载原始报告 ↗</a></div><div id="report"><div class="empty"><div class="empty-icon">≡</div><h3>暂无评审报告</h3></div></div></section>
-<details class="panel search-panel"><summary>公开文献查证 <span class="muted">独立于论文评审</span></summary><p class="muted">仅查询 Crossref 书目信息，不自动发送论文内容；检索结果不自动写入评审报告。</p><input id="query" placeholder="输入已公开的题名或 DOI" maxlength="300"><label class="check"><input type="checkbox" id="approved">我确认该查询可公开，并批准发送到 Crossref。</label><button type="button" id="search" class="secondary">检索公开文献</button><div id="search-results"></div></details>
-</div></div></main><div id="toast" role="alert" hidden></div><script src="/static/evidence.js?v=20261112_1"></script><script src="/static/review.js"></script><script src="/static/app.js?v=20261113_3"></script></body></html>
+</div>
+<div id="experiment-options" hidden>
+<h3>实验材料</h3><p class="muted">每次在页面关联一个实验。补充审查需要一份 PDF、DOCX 或 TXT 论文，不执行作者代码。</p>
+<label>实验名称<input id="experiment-name" value="主实验" maxlength="200"></label>
+<label>该实验在论文中的原文片段<textarea id="experiment-quote" rows="5" maxlength="12000" placeholder="粘贴实验描述及结果，须与论文提取文本一致。"></textarea></label>
+<label>配套文件<input id="material-file" type="file" accept=".py,.json,.jsonl,.yaml,.yml,.csv,.txt,.log,.md"></label>
+<div class="form-grid"><label>材料角色<select id="material-role"><option value="config">配置</option><option value="code">代码</option><option value="data">数据</option><option value="result">结果</option><option value="log">日志</option><option value="description">说明／代码附录</option></select></label>
+<label>数据划分<select id="material-split"><option value="unknown">未指定</option><option value="train">训练集</option><option value="test">测试集</option><option value="validation">验证集</option><option value="all">全量</option></select></label></div>
+<label>样本 ID 列（可选）<input id="material-id-column" placeholder="例如 sample_id；训练／测试需采用相同含义"></label>
+<button class="secondary" type="button" id="add-material">添加此文件</button><ul id="material-list"></ul>
+</div>
+<div id="novelty-options" hidden>
+<h3>联网创新性初判</h3>
+<label>公开查询词，每行一条，最多三条<textarea id="audit-queries" rows="3" placeholder="仅填允许公开的关键词，不会自动发送论文内容。"></textarea></label>
+<label>相关工作截止日期（可选）<input type="date" id="audit-cutoff"></label>
+<label class="check"><input type="checkbox" id="audit-approved">我批准将以上精确查询发送至 Crossref。</label>
+</div>
+<button class="primary" id="submit" type="submit" disabled>开始所选审查 <span>→</span></button>
+</form></section>
+<div class="results-column">
+<section class="panel"><div class="section-heading"><span class="number">02</span><h2>全部审查任务</h2><button class="text-button" id="refresh">刷新</button></div><div id="jobs" class="job-list"><p class="muted">尚无任务。</p></div></section>
+<section class="panel report-panel"><div class="section-heading"><span class="number">03</span><h2>审查报告</h2><a id="download" class="text-button" hidden>下载报告 ↗</a></div>
+<p id="report-paper" class="muted"></p>
+<div class="report-tabs" role="tablist" aria-label="审查报告类别">
+<button type="button" role="tab" id="tab-review" data-tab="review" aria-controls="report" aria-selected="true">规范与逻辑</button>
+<button type="button" role="tab" id="tab-novelty" data-tab="novelty" aria-controls="report" aria-selected="false">创新性初判</button>
+<button type="button" role="tab" id="tab-experiments" data-tab="experiments" aria-controls="report" aria-selected="false">实验材料</button>
+</div>
+<label>该类审查的历史任务<select id="report-history" disabled></select></label>
+<p id="report-task" class="muted"></p>
+<div id="report" role="tabpanel" aria-labelledby="tab-review"><div class="empty"><h3>暂无审查报告</h3></div></div>
+</section>
+<details class="panel search-panel"><summary>公开文献查证 <span class="muted">单条书目查询</span></summary><p class="muted">仅查询 Crossref 书目信息；需要创新性报告时，请勾选左侧“联网创新性初判”。</p><input id="query" placeholder="输入已公开的题名或 DOI" maxlength="300"><label class="check"><input type="checkbox" id="approved">我确认该查询可公开，并批准发送到 Crossref。</label><button type="button" id="search" class="secondary">检索公开文献</button><div id="search-results"></div></details>
+</div></div></main><div id="toast" role="alert" hidden></div>
+<script src="/static/evidence.js?v=20261112_1"></script><script src="/static/review.js"></script><script src="/static/app.js?v=20261116"></script><script src="/static/audit.js?v=20261116"></script><script src="/static/workspace.js?v=20261116"></script>
+</body></html>

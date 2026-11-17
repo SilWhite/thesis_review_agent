@@ -5,7 +5,8 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
-from .api import documents, jobs, reports, search
+from .api import audits, documents, jobs, reports, search, workspace
+from .audit.service import AuditService
 from .config import Settings
 from .jobs import ReviewService
 from .storage import Store
@@ -18,6 +19,7 @@ def create_app(settings=None):
     settings = settings or Settings()
     store = Store(settings.data_dir)
     service = ReviewService(store, settings)
+    audit_service = AuditService(store, settings, service.worker)
 
     @asynccontextmanager
     async def lifespan(app):
@@ -26,6 +28,7 @@ def create_app(settings=None):
 
     app = FastAPI(title="Thesis Review Agent", version="0.1.0", lifespan=lifespan)
     app.state.store, app.state.service = store, service
+    app.state.audit_service = audit_service
 
     @app.exception_handler(FileNotFoundError)
     async def missing(request, exc):
@@ -55,10 +58,16 @@ def create_app(settings=None):
     app.include_router(jobs.create_router(store, settings, service))
     app.include_router(reports.create_router(store))
     app.include_router(search.create_router(store))
+    app.include_router(audits.create_router(store, settings, audit_service))
+    app.include_router(workspace.create_router(store))
     app.mount("/static", StaticFiles(directory=STATIC), name="static")
 
     @app.get("/")
     def index():
+        return FileResponse(STATIC / "index.html")
+
+    @app.get("/audit", include_in_schema=False)
+    def audit_page():
         return FileResponse(STATIC / "index.html")
 
     return app

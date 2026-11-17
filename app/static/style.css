@@ -604,3 +604,20 @@ footer {
         gap: 8px
     }
 }
+
+/* Unified workbench; existing report and evidence styles stay shared. */
+.check-options { border: 1px solid var(--line); border-radius: 8px; margin: 20px 0; padding: 8px 14px; }
+.check-options legend { color: var(--accent); font-weight: 600; }
+.report-tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+.report-tabs button { border: 1px solid var(--line); border-radius: 6px; background: #fff; padding: 9px 12px; cursor: pointer; color: var(--ink); }
+.report-tabs button[aria-selected=true] { background: var(--accent); border-color: var(--accent); color: #fff; }
+.task-group { margin: 10px 0; padding: 10px; border: 1px solid var(--line); border-radius: 8px; }
+.task-group.selected { border-color: #aac9b8; background: #f7faf8; }
+.task-group h3 { margin: 0 0 5px; font-size: 13px; overflow-wrap: anywhere; }
+.task-group .job { padding: 8px 0; }
+.task-group .job button { overflow-wrap: anywhere; }
+#jobs { max-height: 400px; }
+#report-task, #report-paper { overflow-wrap: anywhere; }
+.audit-finding { display: block; }
+.audit-finding blockquote { overflow-wrap: anywhere; }
+HTML
