@@ -14,8 +14,11 @@ class Experiment(BaseModel):
 class AuditRequest(BaseModel):
     document_id: str
     experiments: list[Experiment] = Field(default_factory=list, max_length=10)
-    public_queries: list[str] = Field(default_factory=list, max_length=3)
+    public_queries: list[str] = Field(default_factory=list, max_length=10)
     search_approved: bool = False
+    check_novelty: bool = True
+    check_citations: bool = True
+    check_experiments: bool = False
     literature_cutoff: str | None = Field(default=None, pattern=r"^\d{4}-\d{2}-\d{2}$")
     degree: Literal["bachelor", "master", "doctor", "unknown"] = "master"
     model_mode: Literal["local", "mock"] = "local"
@@ -24,8 +27,13 @@ class AuditRequest(BaseModel):
     def valid_scope(self):
         from datetime import date
 
-        if not self.experiments and not self.public_queries:
-            raise ValueError("请提供实验材料关联或公开检索词。")
+        if (
+            not self.experiments
+            and not self.public_queries
+            and not self.check_citations
+            and not self.check_novelty
+        ):
+            raise ValueError("请提供实验材料关联、公开检索词或勾选审查项。")
         if len({e.id for e in self.experiments}) != len(self.experiments):
             raise ValueError("实验 ID 不得重复。")
         if any(not 2 <= len(q.strip()) <= 300 for q in self.public_queries):

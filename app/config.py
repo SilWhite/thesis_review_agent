@@ -15,3 +15,4 @@ class Settings:
     model_key: str = os.getenv("MODEL_API_KEY", "")
     max_upload: int = int(os.getenv("MAX_UPLOAD_BYTES", str(100 * 1024 * 1024)))
     model_timeout: int = int(os.getenv("MODEL_TIMEOUT", "600"))
+    semantic_scholar_api_key: str = os.getenv("SEMANTIC_SCHOLAR_API_KEY", "")

@@ -1,6 +1,7 @@
 """Optional LangGraph audit using the existing service's single worker and Store."""
 
 import logging
+import os
 from typing import TypedDict
 
 from langgraph.graph import END, START, StateGraph
@@ -10,9 +11,10 @@ from app.documents.parser import parse_document
 from app.jobs import TERMINAL
 from app.model_client import ModelClient
 from app.storage import new_id, now
+from .citations import audit_citations
 from .consistency import compare, paper_facts, semantic_review
 from .materials import read_material
-from .novelty import assess, retrieve
+from .novelty import assess, extract_claims_from_paper, retrieve
 from .reporting import markdown
 
 log = logging.getLogger(__name__)
@@ -25,6 +27,7 @@ class AuditState(TypedDict, total=False):
     warnings: list[str]
     experiments: list[dict]
     novelty: dict
+    citations: dict
     client: ModelClient
     document: dict
 
@@ -105,6 +108,7 @@ class AuditService:
             ("parse", self.parse),
             ("experiments", self.experiments),
             ("novelty", self.novelty),
+            ("citations", self.citations),
             ("report", self.report),
         ]:
             graph.add_node(name, function)
@@ -112,7 +116,8 @@ class AuditService:
             (START, "parse"),
             ("parse", "experiments"),
             ("experiments", "novelty"),
-            ("novelty", "report"),
+            ("novelty", "citations"),
+            ("citations", "report"),
             ("report", END),
         ]:
             graph.add_edge(left, right)
@@ -215,43 +220,147 @@ class AuditService:
     def novelty(self, state):
         self.enter(state, "novelty")
         request = state["request"]
-        if not request.public_queries:
+        if not getattr(request, "check_novelty", True) or (
+            not request.public_queries and not getattr(request, "search_approved", False)
+        ):
+            reason = (
+                "已关闭创新性核查。"
+                if not getattr(request, "check_novelty", True)
+                else "未提交公开检索词或未勾选公开检索授权。"
+            )
             return dict(
                 novelty=dict(
                     status="未启用",
-                    basis="未提交公开检索词。",
+                    basis=reason,
+                    summary=reason,
                     comparisons=[],
                     sources=[],
                     notes=[],
                 )
             )
-        try:
-            sources, searches = retrieve(
-                request.public_queries, request.literature_cutoff
+
+        queries = list(request.public_queries)
+        paper_text = "\n".join(b["text"] for b in state["blocks"])
+
+        extract_errors: list[str] = []
+        claims = extract_claims_from_paper(
+            state.get("client"), request.model_mode, paper_text, errors=extract_errors
+        )
+        if not queries:
+            for c in claims:
+                first_en = (c.get("queries") or ([c.get("query")] if c.get("query") else []))[0:1]
+                for q in first_en:
+                    if q and q not in queries:
+                        queries.append(q)
+            for c in claims:
+                qz = c.get("query_zh")
+                if qz and qz not in queries:
+                    queries.append(qz)
+            for c in claims:
+                for q in (c.get("queries") or [])[1:]:
+                    if q and q not in queries:
+                        queries.append(q)
+
+        if not queries:
+            if extract_errors:
+                return dict(
+                    novelty=dict(
+                        status="信息不足",
+                        basis="模型创新点提取失败。",
+                        summary=f"创新点提取失败：{extract_errors[0]}",
+                        claims=[],
+                        comparisons=[],
+                        sources=[],
+                        notes=extract_errors,
+                    )
+                )
+            return dict(
+                novelty=dict(
+                    status="未启用",
+                    basis="未能从论文中提取出有效检索关键词。",
+                    summary="未提取出用于检索前人文献的关键词。",
+                    comparisons=[],
+                    sources=[],
+                    notes=[],
+                )
             )
+
+        try:
+            s2_key = (
+                getattr(self.settings, "semantic_scholar_api_key", "")
+                or os.getenv("SEMANTIC_SCHOLAR_API_KEY")
+                or os.getenv("S2_API_KEY")
+                or ""
+            )
+            sources, searches = retrieve(
+                queries,
+                request.literature_cutoff,
+                s2_api_key=s2_key,
+                claims=claims,
+                checkpoint=lambda: self.enter(state, "novelty"),
+            )
+        except AuditCancelled:
+            raise
         except Exception as exc:
             return dict(
                 novelty=dict(
                     status="信息不足",
                     basis="公开检索未完成。",
+                    summary=f"公开文献检索失败：{exc}",
                     comparisons=[],
                     sources=[],
                     searches=[],
-                    notes=[f"公开检索失败：{exc}"],
+                    notes=extract_errors + [f"公开检索失败：{exc}"],
                 )
             )
         result = assess(
             state["client"],
             request.model_mode,
-            "\n".join(b["text"] for b in state["blocks"]),
+            paper_text,
             sources,
             request.degree,
+            claims=claims,
         )
+        if extract_errors:
+            result["notes"] = extract_errors + result.get("notes", [])
         result.update(searches=searches, literature_cutoff=request.literature_cutoff)
         return dict(novelty=result)
 
+    def citations(self, state):
+        self.enter(state, "citations")
+        request = state["request"]
+        if not getattr(request, "check_citations", True):
+            return dict(
+                citations=dict(
+                    status="未启用",
+                    summary="未启用参考文献防幻觉核查。",
+                    total_checked=0,
+                    verified_count=0,
+                    mismatch_count=0,
+                    phantom_count=0,
+                    items=[],
+                    notes=[],
+                )
+            )
+        try:
+            s2_key = os.getenv("SEMANTIC_SCHOLAR_API_KEY") or os.getenv("S2_API_KEY") or getattr(self.settings, "s2_api_key", "")
+            res = audit_citations(state["blocks"], s2_api_key=s2_key)
+        except Exception as exc:
+            res = dict(
+                status="核查异常",
+                summary=f"参考文献核查执行失败：{exc}",
+                total_checked=0,
+                verified_count=0,
+                mismatch_count=0,
+                phantom_count=0,
+                items=[],
+                notes=[str(exc)],
+            )
+        return dict(citations=res)
+
     def report(self, state):
         self.enter(state, "reporting")
+        citations = state.get("citations", {})
         report = dict(
             schema_version="audit-1.0",
             id=state["identifier"],
@@ -261,13 +370,14 @@ class AuditService:
             mode=state["request"].model_mode,
             experiments=state["experiments"],
             novelty=state["novelty"],
+            citations=citations,
             limitations=state["warnings"]
             + [
                 "仅审查指定论文片段和所提供材料，不执行作者代码，不复现训练或评估。",
                 "材料关联、样本含义、配置是否生效及材料完整性仍需人工确认。",
                 "来源匹配不证明内容真实；不能据此认定或排除伪造、AI生成数据。",
-                "创新性为有限候选的书目／摘要初判，非全面查新；不保证语义判断正确。",
-                "数值检查只覆盖已识别字段；未完整解析图表、公式和所有代码执行路径。",
+                "创新性初判基于公开学术数据库与大模型对比分析，不能代替正式科技查新报告。",
+                "参考文献防幻觉核查基于 Crossref 公开记录匹配，未收录或非标准著录格式文献可能需人工复核。",
             ],
         )
         folder = self.store.folder("audits", state["identifier"])
@@ -277,6 +387,7 @@ class AuditService:
             or any(e["notes"] for e in state["experiments"])
             or state["novelty"]["status"] == "信息不足"
             or bool(state["novelty"]["notes"])
+            or bool(citations.get("phantom_count", 0) > 0)
         )
         with self.store.lock:
             if self.state(state["identifier"])["status"] == "cancelled":

@@ -1,5 +1,5 @@
 // One material selection, existing submissions, server-side history grouped by paper.
-const labels = {review: '规范与逻辑', novelty: '创新性初判', experiments: '实验材料'};
+const labels = {review: '规范与逻辑', novelty: '创新性与防抄袭', citations: '参考文献核查', experiments: '实验材料'};
 const uploadedFiles = new WeakMap(), reportChoices = new Map();
 let groups = [], selectedPaper = null, currentTab = 'review', lastView = null, refreshing = false;
 
@@ -50,13 +50,14 @@ $('#review-form').onsubmit = async event => {
         const checks = selectedChecks(), files = $('#files').files;
         if (!checks.length) throw new Error('请至少选择一项审查。');
         if (!files.length && !$('#paper-existing').value) throw new Error('请上传论文文件或选择已有论文。');
-        const supplemental = checks.includes('novelty') || checks.includes('experiments');
-        if (supplemental && files.length > 1) throw new Error('创新性与实验材料审查每次需要一份论文。');
+        const supplemental = checks.includes('novelty') || checks.includes('citations') || checks.includes('experiments');
+        if (supplemental && files.length > 1) throw new Error('补充审查每次需要一份论文。');
         const queries = checks.includes('novelty') ? $('#audit-queries').value.split('\n').map(q => q.trim()).filter(Boolean) : [];
         const quote = $('#experiment-quote').value.trim();
-        if (checks.includes('novelty') && (!queries.length || queries.length > 3 || queries.some(q => q.length < 2 || q.length > 300)))
-            throw new Error('请填写 1–3 条公开查询，每条 2–300 字符。');
-        if (checks.includes('novelty') && !$('#audit-approved').checked) throw new Error('请先批准公开查询。');
+        if (queries.length > 3 || queries.some(q => q.length < 2 || q.length > 300))
+            throw new Error('自定义公开查询每条须为 2–300 字符，最多 3 条。');
+        if (checks.includes('novelty') && !$('#audit-approved').checked)
+            throw new Error('请先勾选批准公开学术检索授权。');
         if (checks.includes('experiments') && !quote) throw new Error('请填写实验对应的论文原文片段。');
         const ids = files.length ? await upload(files, 'primary') : [$('#paper-existing').value];
         prepared = true;
@@ -74,6 +75,9 @@ $('#review-form').onsubmit = async event => {
         }
         if (supplemental) {
             const task = await post('/audits', {document_id: ids[0], model_mode: 'local', degree: $('#degree').value,
+                check_novelty: checks.includes('novelty'),
+                check_citations: checks.includes('citations'),
+                check_experiments: checks.includes('experiments'),
                 public_queries: queries, search_approved: checks.includes('novelty') && $('#audit-approved').checked,
                 literature_cutoff: checks.includes('novelty') ? $('#audit-cutoff').value || null : null,
                 experiments: checks.includes('experiments') ? [{id: 'E01', name: $('#experiment-name').value,
@@ -94,12 +98,21 @@ $('#review-form').onsubmit = async event => {
     }
 };
 
+function updateJobActiveState(taskId) {
+    document.querySelectorAll('#jobs .task-group').forEach(el => {
+        el.classList.toggle('selected', el.dataset.docId === selectedPaper);
+    });
+    document.querySelectorAll('#jobs .job').forEach(el => {
+        el.classList.toggle('selected', el.dataset.taskId === taskId);
+    });
+}
+
 async function renderSelection() {
     const group = groups.find(g => g.document_id === selectedPaper);
     $('#report-paper').textContent = group ? group.title : '';
     document.querySelectorAll('[data-tab]').forEach(button => button.setAttribute('aria-selected', String(button.dataset.tab === currentTab)));
     $('#report').setAttribute('aria-labelledby', 'tab-' + currentTab);
-    const tasks = group ? group.tasks.filter(task => task.checks.includes(currentTab)) : [];
+    const tasks = group ? group.tasks.filter(task => (task.checks || []).includes(currentTab)) : [];
     const choices = reportChoices.get(selectedPaper) || {};
     reportChoices.set(selectedPaper, choices);
     const task = tasks.find(task => task.id === choices[currentTab]) || tasks[0];
@@ -113,6 +126,7 @@ async function renderSelection() {
     $('#report-history').disabled = !tasks.length;
     $('#report-task').textContent = task ? `任务 ${task.id} · ${statuses[task.status] || task.status} · 各页签保留各自的任务时间与结果。` : '';
     selected = task?.id || null;
+    updateJobActiveState(selected);
     if (!task) {
         $('#download').hidden = true;
         $('#report').innerHTML = `<p class="muted">${group ? '该论文尚未提交此类审查。' : '请选择任务或提交所选审查。'}</p>`;
@@ -124,37 +138,67 @@ async function renderSelection() {
         await showReport(task);
     } else await showAuditReport(task, currentTab);
 }
-function chooseTask(id) {
+
+async function chooseTask(id) {
     for (const group of groups) {
         const task = group.tasks.find(t => t.id === id);
         if (!task) continue;
         selectedPaper = group.document_id;
+        const checks = (task.checks && task.checks.length) ? task.checks : [(task.kind === 'review' ? 'review' : 'novelty')];
         const choices = reportChoices.get(selectedPaper) || {};
-        for (const check of task.checks) choices[check] = id;
+        for (const check of checks) choices[check] = id;
         reportChoices.set(selectedPaper, choices);
-        currentTab = task.checks[0];
-        return renderSelection();
+        if (!checks.includes(currentTab)) {
+            currentTab = checks[0];
+        }
+        updateJobActiveState(id);
+        await renderSelection();
+        return;
     }
 }
-async function refresh() {
+
+let lastJobsSummary = '';
+function hasActiveTasks() {
+    return groups.some(g => (g.tasks || []).some(t => ['queued', 'running'].includes(t.status)));
+}
+
+async function refresh(forceRebuild = false) {
     if (refreshing) return;
     refreshing = true;
     try {
         groups = await api('/workspace/tasks');
         if (!selectedPaper && groups.length) selectedPaper = groups[0].document_id;
-        $('#jobs').innerHTML = groups.map(group => `<section class="task-group ${group.document_id === selectedPaper ? 'selected' : ''}"><h3>${esc(group.title)}</h3>${group.tasks.map(task =>
-            `<div class="job"><button type="button" data-task="${esc(task.id)}">${esc(task.checks.map(c => labels[c]).join('＋'))}<small>${esc(new Date(task.created_at).toLocaleString())}${task.document_ids.length > 1 ? ' · ' + task.document_ids.length + ' 份论文' : ''}</small></button>
-            <span class="status ${esc(task.status)}">${esc(statuses[task.status] || task.status)}</span>${['queued', 'running'].includes(task.status) ? `<button type="button" class="text-button" data-cancel="${esc(task.id)}" data-kind="${task.kind}">取消</button>` : ''}</div>`).join('')}</section>`).join('') || '<p class="muted">尚无任务。</p>';
-        document.querySelectorAll('[data-task]').forEach(button => button.onclick = () => chooseTask(button.dataset.task).catch(error => notify(error.message)));
-        document.querySelectorAll('[data-cancel]').forEach(button => button.onclick = async () => {
-            try {
-                await post(`/${button.dataset.kind === 'review' ? 'jobs' : 'audits'}/${button.dataset.cancel}/cancel`, {});
-                await refresh();
-            } catch (error) { notify(error.message); }
-        });
+        
+        const summary = selectedPaper + '|' + groups.map(g => 
+            g.document_id + ':' + (g.tasks || []).map(t => 
+                t.id + t.status + t.stage + (t.checks || []).join(',')
+            ).join(';')
+        ).join('|');
+
+        if (forceRebuild || summary !== lastJobsSummary) {
+            lastJobsSummary = summary;
+            $('#jobs').innerHTML = groups.map(group => `<section class="task-group ${group.document_id === selectedPaper ? 'selected' : ''}" data-doc-id="${esc(group.document_id)}"><h3>${esc(group.title)}</h3>${group.tasks.map(task => {
+                const checks = (task.checks && task.checks.length) ? task.checks : [(task.kind === 'review' ? 'review' : 'novelty')];
+                const checkLabels = checks.map(c => labels[c] || c).join('＋');
+                return `<div class="job ${selected === task.id ? 'selected' : ''}" data-task-id="${esc(task.id)}"><button type="button" data-task="${esc(task.id)}">${esc(checkLabels)}<small>${esc(new Date(task.created_at).toLocaleString())}${task.document_ids.length > 1 ? ' · ' + task.document_ids.length + ' 份论文' : ''}</small></button>
+                <span class="status ${esc(task.status)}">${esc(statuses[task.status] || task.status)}</span>${['queued', 'running'].includes(task.status) ? `<button type="button" class="text-button" data-cancel="${esc(task.id)}" data-kind="${task.kind}">取消</button>` : ''}</div>`;
+            }).join('')}</section>`).join('') || '<p class="muted">尚无任务。</p>';
+
+            document.querySelectorAll('[data-task]').forEach(button => button.onclick = () => chooseTask(button.dataset.task).catch(error => notify(error.message)));
+            document.querySelectorAll('[data-cancel]').forEach(button => button.onclick = async () => {
+                try {
+                    await post(`/${button.dataset.kind === 'review' ? 'jobs' : 'audits'}/${button.dataset.cancel}/cancel`, {});
+                    lastJobsSummary = '';
+                    await refresh(true);
+                } catch (error) { notify(error.message); }
+            });
+        } else {
+            updateJobActiveState(selected);
+        }
         await renderSelection();
     } finally { refreshing = false; }
 }
+
 for (const button of document.querySelectorAll('[data-tab]')) button.onclick = () => {
     currentTab = button.dataset.tab; renderSelection().catch(error => notify(error.message));
 };
@@ -163,7 +207,7 @@ $('#report-history').onchange = () => {
     choices[currentTab] = $('#report-history').value; reportChoices.set(selectedPaper, choices);
     renderSelection().catch(error => notify(error.message));
 };
-$('#refresh').onclick = () => refresh().catch(error => notify(error.message));
+$('#refresh').onclick = () => { lastJobsSummary = ''; refresh(true).catch(error => notify(error.message)); };
 $('#search').onclick = async () => {
     $('#search').disabled = true;
     try {
@@ -172,12 +216,23 @@ $('#search').onclick = async () => {
     } catch (error) { notify(error.message); }
     finally { $('#search').disabled = false; }
 };
+
+async function pollLoop() {
+    try {
+        await refresh();
+    } catch (e) {
+        // network hiccup; ignore in background poll
+    }
+    const delay = hasActiveTasks() ? 2500 : 7000;
+    setTimeout(pollLoop, delay);
+}
+
 async function init() {
     const config = await api('/config');
     modelAvailable = Boolean(config.local_model_available);
     $('#mode option[value=local]').textContent = modelAvailable ? '模型评审' : '模型暂不可用';
     $('#submit').disabled = !modelAvailable;
-    showOptions(); await loadDocuments(); await refresh();
+    showOptions(); await loadDocuments(); await refresh(true);
+    pollLoop();
 }
 init().catch(error => notify(error.message));
-setInterval(() => refresh().catch(error => notify('服务连接异常：' + error.message)), 1500);
