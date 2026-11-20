@@ -19,10 +19,17 @@ def _parse_model_response(content: str) -> Dict[str, Any]:
     if fenced:
         content = fenced.group(1).strip()
     parsed = json.loads(content)
-    if (
-        not isinstance(parsed, dict)
-        or not isinstance(parsed.get("findings"), list)
-        or any(not isinstance(item, dict) for item in parsed["findings"])
+    if not isinstance(parsed, dict):
+        raise ValueError("模型返回格式不符合预期结构")
+    if "findings" not in parsed:
+        if "comparisons" in parsed and isinstance(parsed["comparisons"], list):
+            parsed["findings"] = parsed["comparisons"]
+        elif "claims" in parsed and isinstance(parsed["claims"], list):
+            parsed["findings"] = parsed["claims"]
+        else:
+            raise ValueError("模型返回格式不符合预期结构")
+    elif not isinstance(parsed["findings"], list) or any(
+        not isinstance(item, dict) for item in parsed["findings"]
     ):
         raise ValueError("模型返回格式不符合预期结构")
     return parsed

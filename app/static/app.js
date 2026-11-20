@@ -47,6 +47,8 @@ function notify(message) {
     $('#toast').hidden = false;
     setTimeout(() => $('#toast').hidden = true, 6000);
 }
+const jobReportCache = new Map();
+
 async function showReport(job) {
     const key = job.id + job.updated_at;
     if (lastRendered === key) return;
@@ -54,11 +56,17 @@ async function showReport(job) {
     if (['completed', 'partial'].includes(job.status)) {
         let report, content, decisions;
         try {
-            [report, content, decisions] = await Promise.all([
-                api(`/jobs/${job.id}/report`),
-                api(`/jobs/${job.id}/content`).catch(() => ({ blocks: [] })),
-                api(`/jobs/${job.id}/review-decisions`)
-            ]);
+            let cached = jobReportCache.get(key);
+            if (cached) {
+                [report, content, decisions] = cached;
+            } else {
+                [report, content, decisions] = await Promise.all([
+                    api(`/jobs/${job.id}/report`),
+                    api(`/jobs/${job.id}/content`).catch(() => ({ blocks: [] })),
+                    api(`/jobs/${job.id}/review-decisions`)
+                ]);
+                jobReportCache.set(key, [report, content, decisions]);
+            }
         } catch (e) {
             if (selected !== job.id || currentTab !== 'review') return;
             activeReview = null;

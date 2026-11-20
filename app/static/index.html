@@ -12,7 +12,8 @@
 <div id="upload-status" class="muted" aria-live="polite"></div>
 <fieldset class="check-options"><legend>审查内容</legend>
 <label class="check"><input id="check-review" type="checkbox" checked>规范与逻辑（37 项）</label>
-<label class="check"><input id="check-novelty" type="checkbox">联网创新性初判</label>
+<label class="check"><input id="check-novelty" type="checkbox">思想抄袭与创新性核查</label>
+<label class="check"><input id="check-citations" type="checkbox">参考文献防幻觉核查</label>
 <label class="check"><input id="check-experiments" type="checkbox">实验材料一致性</label>
 </fieldset>
 <div class="form-grid"><label>学位层次<select id="degree"><option value="master">硕士</option><option value="bachelor">本科</option><option value="doctor">博士</option><option value="unknown">未说明</option></select></label>
@@ -34,10 +35,11 @@
 <button class="secondary" type="button" id="add-material">添加此文件</button><ul id="material-list"></ul>
 </div>
 <div id="novelty-options" hidden>
-<h3>联网创新性初判</h3>
-<label>公开查询词，每行一条，最多三条<textarea id="audit-queries" rows="3" placeholder="仅填允许公开的关键词，不会自动发送论文内容。"></textarea></label>
+<h3>思想抄袭与创新性核查</h3>
+<p class="muted">自动抽取论文核心创新点与前序文献比对，排查撞车与思想抄袭。支持手动指定公开检索词。</p>
+<label>自定义公开检索词（可选，留空将自动从论文中提取；每行一条，最多三条）<textarea id="audit-queries" rows="3" placeholder="可选填。留空将自动由大模型提取论文核心创新点生成学术检索词。"></textarea></label>
 <label>相关工作截止日期（可选）<input type="date" id="audit-cutoff"></label>
-<label class="check"><input type="checkbox" id="audit-approved">我批准将以上精确查询发送至 Crossref。</label>
+<label class="check"><input type="checkbox" id="audit-approved" checked>我批准将检索词发送至 Crossref / 学术数据库进行文献比对。</label>
 </div>
 <button class="primary" id="submit" type="submit" disabled>开始所选审查 <span>→</span></button>
 </form></section>
@@ -47,7 +49,8 @@
 <p id="report-paper" class="muted"></p>
 <div class="report-tabs" role="tablist" aria-label="审查报告类别">
 <button type="button" role="tab" id="tab-review" data-tab="review" aria-controls="report" aria-selected="true">规范与逻辑</button>
-<button type="button" role="tab" id="tab-novelty" data-tab="novelty" aria-controls="report" aria-selected="false">创新性初判</button>
+<button type="button" role="tab" id="tab-novelty" data-tab="novelty" aria-controls="report" aria-selected="false">创新性与防抄袭</button>
+<button type="button" role="tab" id="tab-citations" data-tab="citations" aria-controls="report" aria-selected="false">参考文献核查</button>
 <button type="button" role="tab" id="tab-experiments" data-tab="experiments" aria-controls="report" aria-selected="false">实验材料</button>
 </div>
 <label>该类审查的历史任务<select id="report-history" disabled></select></label>

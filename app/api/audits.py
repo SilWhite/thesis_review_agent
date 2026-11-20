@@ -25,7 +25,7 @@ def create_router(store, settings, service):
 
     @router.post("/api/v1/audits", status_code=202)
     def submit(body: AuditRequest):
-        if body.public_queries and not body.search_approved:
+        if body.check_novelty and body.public_queries and not body.search_approved:
             raise HTTPException(403, "请批准将所填的精确公开查询发送至 Crossref。")
         if body.model_mode == "local" and not (
             settings.model_url and settings.model_name
