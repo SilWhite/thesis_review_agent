@@ -566,6 +566,8 @@ function experimentsHtml(experiments) {
     }
     return experiments.map(experiment => `<section><h3>${esc(experiment.name)} · ${esc(experiment.id)}</h3>
         <p>${esc(experiment.status)}</p>
+        ${experiment.repository ? `<p class="muted">仓库版本：${esc(experiment.repository.commit)}；索引 ${experiment.repository.file_count} 个文件，提取 ${(experiment.claims || []).length} 项论文宣称。</p>
+        <details><summary>仓库文件与主张阅读范围</summary><pre class="source">${esc(JSON.stringify({files:experiment.repository.files, claims:experiment.claims, reading_records:experiment.reading_records}, null, 2))}</pre></details>` : ''}
         <p class="muted">同名数值字段：${esc((experiment.coverage?.numeric_fields || []).join(', ') || '无')}；完整 ID 列数据文件 ${(experiment.coverage?.id_files || []).length} 份。</p>
         ${(experiment.findings || []).map(f => `<article class="finding audit-finding"><b>${esc(f.status)}</b><p>${esc(f.issue)}</p>
             ${(f.evidence || []).map(e => `<blockquote>${esc(e.filename)} / ${esc(e.location || '')}\n${esc(e.quote ?? e.value ?? '')}</blockquote>`).join('')}

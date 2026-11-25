@@ -71,6 +71,12 @@ def read_material(store, identifier):
     folder = store.folder("audit-materials", identifier)
     meta = store.read(folder, "material.json")
     text = (folder / ("source" + meta["suffix"])).read_text(encoding="utf-8-sig")
+    return parse_material(meta, text)
+
+
+def parse_material(meta, text):
+    """Shared text parser for uploaded materials and repository snapshots."""
+    identifier = meta["id"]
     source = dict(
         id=identifier,
         filename=meta["filename"],

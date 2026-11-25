@@ -12,6 +12,7 @@ from app.jobs import TERMINAL
 from app.model_client import ModelClient
 from app.storage import new_id, now
 from .citations import audit_citations
+from .code_review import review as review_repository
 from .consistency import compare, paper_facts, semantic_review
 from .materials import read_material
 from .novelty import assess, extract_claims_from_paper, retrieve
@@ -140,6 +141,18 @@ class AuditService:
         paper = "\n".join(b["text"] for b in state["blocks"])
         results = []
         client = state["client"]
+        if request.repository:
+            results.append(
+                review_repository(
+                    self.store,
+                    self.store.folder("audits", state["identifier"]),
+                    request.repository,
+                    state["blocks"],
+                    client,
+                    request.model_mode,
+                    lambda: self.enter(state, "experiments"),
+                )
+            )
         for experiment in request.experiments:
             self.enter(state, "experiments")
             if experiment.paper_quote not in paper:
@@ -221,7 +234,8 @@ class AuditService:
         self.enter(state, "novelty")
         request = state["request"]
         if not getattr(request, "check_novelty", True) or (
-            not request.public_queries and not getattr(request, "search_approved", False)
+            not request.public_queries
+            and not getattr(request, "search_approved", False)
         ):
             reason = (
                 "已关闭创新性核查。"
@@ -248,7 +262,9 @@ class AuditService:
         )
         if not queries:
             for c in claims:
-                first_en = (c.get("queries") or ([c.get("query")] if c.get("query") else []))[0:1]
+                first_en = (
+                    c.get("queries") or ([c.get("query")] if c.get("query") else [])
+                )[0:1]
                 for q in first_en:
                     if q and q not in queries:
                         queries.append(q)
@@ -343,7 +359,11 @@ class AuditService:
                 )
             )
         try:
-            s2_key = os.getenv("SEMANTIC_SCHOLAR_API_KEY") or os.getenv("S2_API_KEY") or getattr(self.settings, "s2_api_key", "")
+            s2_key = (
+                os.getenv("SEMANTIC_SCHOLAR_API_KEY")
+                or os.getenv("S2_API_KEY")
+                or getattr(self.settings, "s2_api_key", "")
+            )
             res = audit_citations(state["blocks"], s2_api_key=s2_key)
         except Exception as exc:
             res = dict(

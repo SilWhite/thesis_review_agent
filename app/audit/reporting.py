@@ -59,11 +59,21 @@ def markdown(report):
                 if source:
                     source_title = source.get("title") or "相关文献"
                     source_url = source.get("url") or ""
-                    venue_str = f" · 刊物/会议: {source['venue']}" if source.get("venue") else ""
-                    cit_str = f" · 被引: {source['citation_count']}" if source.get("citation_count") is not None else ""
+                    venue_str = (
+                        f" · 刊物/会议: {source['venue']}"
+                        if source.get("venue")
+                        else ""
+                    )
+                    cit_str = (
+                        f" · 被引: {source['citation_count']}"
+                        if source.get("citation_count") is not None
+                        else ""
+                    )
                     source_line = f"- **对标先验文献**：[{source_title}]({source_url})（{source.get('year') or source.get('published') or '年份未知'}{venue_str}{cit_str}）"
                 else:
-                    source_line = "- **对标先验文献**：（当前检索库未匹配到可直接对标的先验文献）"
+                    source_line = (
+                        "- **对标先验文献**：（当前检索库未匹配到可直接对标的先验文献）"
+                    )
                 out += [
                     "",
                     f"#### 创新主张 #{idx + 1}：“{item.get('claim', '核心方法')}”",
@@ -74,9 +84,13 @@ def markdown(report):
                 if item.get("prior_works_summary"):
                     out.append(f"- **前人已有工作概括**：{item['prior_works_summary']}")
                 if item.get("prosecutor_overlap"):
-                    out.append(f"- **思想重合审查（重合风险）**：{item['prosecutor_overlap']}")
+                    out.append(
+                        f"- **思想重合审查（重合风险）**：{item['prosecutor_overlap']}"
+                    )
                 if item.get("defender_novelty"):
-                    out.append(f"- **独特增量抗辩（创新保护）**：{item['defender_novelty']}")
+                    out.append(
+                        f"- **独特增量抗辩（创新保护）**：{item['defender_novelty']}"
+                    )
                 out += [
                     f"- **Delta 核心差异裁决**：{item.get('difference', '')}",
                     "- **原文佐证依据**：",
@@ -105,7 +119,11 @@ def markdown(report):
                             link_title,
                             s.get("year") or s.get("published") or "-",
                             s.get("venue") or "-",
-                            str(s["citation_count"]) if s.get("citation_count") is not None else "-",
+                            (
+                                str(s["citation_count"])
+                                if s.get("citation_count") is not None
+                                else "-"
+                            ),
                             tldr,
                         ]
                     )
@@ -153,7 +171,11 @@ def markdown(report):
                             it.get("id", ""),
                             it.get("raw", ""),
                             matched_desc,
-                            f"{int(it.get('similarity', 0)*100)}%" if it.get("similarity") else "0%",
+                            (
+                                f"{int(it.get('similarity', 0)*100)}%"
+                                if it.get("similarity")
+                                else "0%"
+                            ),
                             it.get("status_cn", ""),
                             it.get("note", ""),
                         ]
@@ -201,6 +223,17 @@ def markdown(report):
                         ]
                     )
                     + " |"
+                )
+            if experiment.get("repository"):
+                repo = experiment["repository"]
+                out += [
+                    "",
+                    f"仓库：{repo['location']}；commit：{repo['commit']}；索引文件：{repo['file_count']}",
+                ]
+                out.extend(f"- {f['path']}：{f['sha256']}" for f in repo["files"])
+                out.extend(
+                    f"- 主张 {c['id']} [{c['kind']}]：{c['evidence']['filename']} / {c['evidence']['location']}：{c['evidence']['quote']}"
+                    for c in experiment.get("claims", [])
                 )
             out.extend("- " + note for note in experiment.get("notes", []))
         out.append("")

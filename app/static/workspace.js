@@ -1,5 +1,5 @@
 // One material selection, existing submissions, server-side history grouped by paper.
-const labels = {review: '规范与逻辑', novelty: '创新性与防抄袭', citations: '参考文献核查', experiments: '实验材料'};
+const labels = {review: '规范与逻辑', novelty: '创新性与防抄袭', citations: '参考文献核查', experiments: '实验与代码'};
 const uploadedFiles = new WeakMap(), reportChoices = new Map();
 let groups = [], selectedPaper = null, currentTab = 'review', lastView = null, refreshing = false;
 
@@ -12,6 +12,7 @@ function showOptions() {
     $('#experiment-options').hidden = !$('#check-experiments').checked;
 }
 for (const check of Object.keys(labels)) $('#check-' + check).onchange = showOptions;
+$('#repository-location').oninput = () => { $('#legacy-experiment').hidden = Boolean($('#repository-location').value.trim()); };
 $('#files').onchange = () => { if ($('#files').files.length) $('#paper-existing').value = ''; };
 $('#paper-existing').onchange = () => { if ($('#paper-existing').value) $('#files').value = ''; };
 
@@ -58,7 +59,12 @@ $('#review-form').onsubmit = async event => {
             throw new Error('自定义公开查询每条须为 2–300 字符，最多 3 条。');
         if (checks.includes('novelty') && !$('#audit-approved').checked)
             throw new Error('请先勾选批准公开学术检索授权。');
-        if (checks.includes('experiments') && !quote) throw new Error('请填写实验对应的论文原文片段。');
+        const repositoryLocation = $('#repository-location').value.trim();
+        const repository = checks.includes('experiments') && repositoryLocation ? {
+            kind: /^https?:\/\//i.test(repositoryLocation) ? 'github' : 'local',
+            location: repositoryLocation, ref: null
+        } : null;
+        if (checks.includes('experiments') && !repository && !quote) throw new Error('请填写实验对应的论文原文片段或提供仓库。');
         const ids = files.length ? await upload(files, 'primary') : [$('#paper-existing').value];
         prepared = true;
         selectedPaper = ids[0];
@@ -78,9 +84,10 @@ $('#review-form').onsubmit = async event => {
                 check_novelty: checks.includes('novelty'),
                 check_citations: checks.includes('citations'),
                 check_experiments: checks.includes('experiments'),
+                ...(repository ? {repository} : {}),
                 public_queries: queries, search_approved: checks.includes('novelty') && $('#audit-approved').checked,
                 literature_cutoff: checks.includes('novelty') ? $('#audit-cutoff').value || null : null,
-                experiments: checks.includes('experiments') ? [{id: 'E01', name: $('#experiment-name').value,
+                experiments: checks.includes('experiments') && !repository ? [{id: 'E01', name: $('#experiment-name').value,
                     paper_quote: quote, material_ids: [...materialIds]}] : []});
             for (const check of checks.filter(c => c !== 'review')) choices[check] = task.id;
             submitted.push(...checks.filter(c => c !== 'review').map(c => labels[c]));
